@@ -17,7 +17,7 @@ class DB {
                 $this->_connected = "DB_CONNECTED";
             }
         } catch (PDOException $e) {
-            
+            error_log("DB Connection Error (attempt 1): " . $e->getMessage());
         }
         $try = 0;
         while (!$this->_pdo) {
@@ -26,10 +26,10 @@ class DB {
                 try {
                     $this->_pdo = new PDO('mysql:host=' . Config::get('mysql/host') . ';dbname=' . Config::get('mysql/db'), Config::get('mysql/username'), Config::get('mysql/password'));
                 } catch (PDOException $e) {
-                    
+                    error_log("DB Connection Error (attempt " . ($try + 1) . "): " . $e->getMessage());
                 }
                 if ($this->_pdo) {
-                    $this->_connected = "DB_CONNECTED"; // DB Connection Log
+                    $this->_connected = "DB_CONNECTED";
                 }
             } else {
                 Session::put('errors', 'Sorry! We are facing a connection problem, Please <br/><a href="' . Config::get('url/home') . '"><button class="btn btn-default">Refresh <span class="glyphicon glyphicon-refresh"></button></a> ');
@@ -112,19 +112,10 @@ class DB {
     public function insert($table, $fields = array()) {
         if (count($fields)) {
             $keys = array_keys($fields);
-            $values = null;
-            $x = 1;
+            $values = array_fill(0, count($fields), '?');
+            $sql = "INSERT INTO `{$table}` (`" . implode('`, `', $keys) . "`) VALUES (" . implode(', ', $values) . ")";
 
-            foreach ($fields as $field) {
-                $values .= '?';
-                if ($x < count($fields)) {
-                    $values .= ', ';
-                }
-                $x++;
-            }
-            $sql = "INSERT INTO `{$table}` (`" . implode('`, `', $keys) . "`) VALUES ({$values})";
-
-            if (!$this->query($sql, $fields)->error()) {
+            if (!$this->query($sql, array_values($fields))->error()) {
                 return true;
             }
         }
@@ -135,16 +126,19 @@ class DB {
         $set = '';
         $x = 1;
 
-        $sql = "";
         foreach ($fields as $name => $value) {
-            $set .= "{$name} = ?";
+            $set .= "`{$name}` = ?";
             if ($x < count($fields)) {
                 $set .= ', ';
             }
             $x++;
         }
-        $sql = "UPDATE {$table} SET {$set} WHERE `ID` = {$id}";
-        if (!$this->query($sql, $fields)->error()) {
+        
+        $params = array_values($fields);
+        $params[] = $id;
+        $sql = "UPDATE `{$table}` SET {$set} WHERE `ID` = ?";
+        
+        if (!$this->query($sql, $params)->error()) {
             return true;
         }
         return false;
@@ -181,4 +175,4 @@ class DB {
 
 }
 
-?> 
+?>

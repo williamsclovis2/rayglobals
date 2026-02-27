@@ -53,14 +53,14 @@ require_once 'functions/global.php';
 $GLOBALS['config'] = array(
     'mysql' => array(
         // 'host' => 'localhost',
-        // 'username' => 'rayglobals_user',
-        // 'password' => 'rayglobals_2026DB',
-        // 'db' => 'rayglobals_db'
+        'username' => 'amallmpt_rayglobals_usr',
+        'password' => '*&w30J1LIWCz',
+        'db' => 'amallmpt_rayglobals_db'
 
-        'host' => 'localhost',
-        'username' => 'root',
-        'password' => '',
-        'db' => 'rayglobals'
+        // 'host' => 'localhost',
+        // 'username' => 'root',
+        // 'password' => '',
+        // 'db' => 'rayglobals'
     ),
     'remember' => array(
         'cookie_name' => 'hash',
@@ -88,10 +88,10 @@ $GLOBALS['config'] = array(
 
         // ON LOCAL HOST
 		
-        'home' => "$http://{$_SERVER['HTTP_HOST']}/rayglobals",
+        // 'home' => "$http://{$_SERVER['HTTP_HOST']}/rayglobals",
 
         // WHEN ON SERVER 
-        // 'home' => "$http://{$_SERVER['HTTP_HOST']}",  
+        'home' => "$http://{$_SERVER['HTTP_HOST']}",  
         'bk_dir' => "admin",
     ),
     'time' => array(
