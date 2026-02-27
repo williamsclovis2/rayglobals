@@ -32,7 +32,8 @@
     <div class="auto-container">
         <div class="clearfix">
             <div class="pull-left logo-box">
-                <div class="logo"><a href="<?= DN ?>/index"> <img src="<?= DN ?>/assets/images/logo-3.png"  alt="Ray Globals Logo" title=""></a></div>
+                <div class="logo"><a href="<?= DN ?>/index"> 
+                <img src="<?= DN ?>/assets/images/logo-3.png"  alt="Ray Globals Logo" title=""></a></div>
             </div>
             <div class="nav-outer clearfix">
                 <!-- Mobile Navigation Toggler -->

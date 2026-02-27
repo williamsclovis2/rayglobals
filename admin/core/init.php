@@ -52,7 +52,7 @@ require_once 'functions/global.php';
 
 $GLOBALS['config'] = array(
     'mysql' => array(
-        // 'host' => 'localhost',
+        'host' => 'localhost',
         'username' => 'amallmpt_rayglobals_usr',
         'password' => '*&w30J1LIWCz',
         'db' => 'amallmpt_rayglobals_db'
