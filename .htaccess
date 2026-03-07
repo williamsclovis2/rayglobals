@@ -1,26 +1,24 @@
 RewriteEngine On
 
-
 #-----------------------------------------------#
 # SET THE WEBSITE LANDING PAGE
 #-----------------------------------------------#
 
-RewriteRule ^$  index.php
-RewriteRule ^admin$  cpanel/web_pages/auth.php?page=login
+RewriteRule ^$ index.php [L]
+RewriteRule ^admin/?$ admin/index.php [L]
 
-
-RewriteRule ^vacancies/([0-9]+)$ job-details.php?id=$1      
+RewriteRule ^vacancies/([0-9]+)$ job-details.php?id=$1 [L,QSA]
 
 RewriteCond %{REQUEST_FILENAME}\.html -f
-RewriteRule ^(.*)$ $1.html
+RewriteRule ^(.*)$ $1.html [L]
+
 RewriteCond %{REQUEST_FILENAME}\.php -f
-RewriteRule ^(.*)$ $1.php
+RewriteRule ^(.*)$ $1.php [L]
 
+# SET news PAGES
+RewriteRule ^news/([0-9]+)(/*)$ website/corporate/single_news?action=$1 [L,QSA]
 
- # SET news PAGES
-RewriteRule ^news/([0-9]+)(/*)$ website/corporate/single_news?action=$1
-
-RewriteRule ^scan(/*)$ riba.scan.apk
+RewriteRule ^scan(/*)$ riba.scan.apk [L]
 
 <IfModule mod_rewrite.c>
 RewriteEngine On
