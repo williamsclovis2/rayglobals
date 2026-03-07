@@ -75,6 +75,68 @@ if(Input::checkInput('request','get','1')){
             }
             Redirect::to(DNADMIN.'/login');
 		break;
+
+        /**
+         * ══════════════════════════════════════════════════════════════════
+         * APPLICATION CONTROLLER CASES
+         * Add these cases inside your main switch($post_request) block
+         * (the same file where serie-status, booking-new, etc. live).
+         * ══════════════════════════════════════════════════════════════════
+         */
+
+        // ── Submit a new job application (from apply.php / apply-handler.php) ──
+        case 'job-apply':
+            $form     = JobApplicationController::submit();
+            $enc_back = Input::get('job_enc_id', 'post');
+            if ($form->ERRORS == false) {
+                Session::put('app_sent', '1');                              // ← flag for popup
+                Redirect::to(DN . '/apply.php?id=' . $enc_back . '&sent=1');
+            } else {
+                $msg = is_array($form->ERRORS_SCRIPT)
+                    ? implode(' ', array_filter($form->ERRORS_SCRIPT,
+                        fn($v) => !in_array($v, ['NO_ERRORS','ERRORS_FOUND',''])))
+                    : 'Une erreur est survenue.';
+                Session::put('errors', $msg ?: 'Une erreur est survenue.');
+                Redirect::to(DN . '/apply.php?id=' . $enc_back);
+            }
+        break;
+
+        // ── Change application status (dashboard action) ──
+        case 'application-status':
+            $app_ID = Input::get('app-id', 'post');
+
+            if (Input::checkInput('pending', 'post', '0')) {
+                $form = JobApplicationController::changeStatus('pending', $app_ID);
+            } elseif (Input::checkInput('reviewing', 'post', '0')) {
+                $form = JobApplicationController::changeStatus('reviewing', $app_ID);
+            } elseif (Input::checkInput('accepted', 'post', '0')) {
+                $form = JobApplicationController::changeStatus('accepted', $app_ID);
+            } elseif (Input::checkInput('rejected', 'post', '0')) {
+                $form = JobApplicationController::changeStatus('rejected', $app_ID);
+            }
+
+            if (isset($form) && $form->ERRORS == false) {
+                Session::put('success', 'Statut de la candidature mis à jour.');
+            } else {
+                Session::put('errors', 'Impossible de mettre à jour le statut.');
+            }
+
+            Redirect::to(DNADMIN . '/app/applications/list');
+        break;
+
+        // ── Delete an application ──
+        case 'application-delete':
+            $app_ID = Input::get('app-id', 'post');
+            $form   = JobApplicationController::delete($app_ID);
+
+            if ($form->ERRORS == false) {
+                Session::put('success', 'Candidature supprimée avec succès.');
+            } else {
+                Session::put('errors', 'Impossible de supprimer cette candidature.');
+            }
+
+            Redirect::to(DNADMIN . '/app/applications/list');
+        break;
             
 		case 'resetpassword':
             if(Input::checkInput('id','get','1')){
@@ -105,10 +167,7 @@ if(Input::checkInput('request','get','1')){
 		break;
     }
 }
-?>
 
-
-<?php 
           
 		// USERS
 if(Input::checkInput('request','post','1')){

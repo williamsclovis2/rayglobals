@@ -1,518 +1,772 @@
-<section class="content-header">
-    <div class="page_header">
-        <div class="row">
-            <div class="col-xs-12 col-sm-8">
-                <h3 class="content-title">
-                      Ajouter de nouvelles offres d’emploi
-                </h3>
+<?php
+
+$edit_mode = isset($stori_serie_data) && !empty($stori_serie_data);
+$d = $edit_mode ? $stori_serie_data : (object)[];
+
+function old(string $field, $default = ''): string {
+    if (isset($GLOBALS['form']) && $GLOBALS['form']->ERRORS && Input::get("register-{$field}", 'post')) {
+        return htmlspecialchars(Input::get("register-{$field}", 'post'));
+    }
+    return htmlspecialchars($default);
+}
+
+$competences = [];
+if (isset($GLOBALS['form']) && $GLOBALS['form']->ERRORS && !empty($_POST['register-competences'])) {
+    foreach ((array)$_POST['register-competences'] as $v) {
+        $clean = trim($v);
+        if ($clean !== '') $competences[] = htmlspecialchars($clean);
+    }
+} else {
+    for ($i = 1; $i <= 7; $i++) {
+        $key = "comp_{$i}";
+        $val = $edit_mode ? (isset($d->$key) ? trim($d->$key) : '') : '';
+        if ($val !== '') $competences[] = htmlspecialchars($val);
+    }
+}
+if (empty($competences)) $competences = [''];
+
+$experiences = [];
+if (isset($GLOBALS['form']) && $GLOBALS['form']->ERRORS && !empty($_POST['register-experiences'])) {
+    foreach ((array)$_POST['register-experiences'] as $v) {
+        $clean = trim($v);
+        if ($clean !== '') $experiences[] = htmlspecialchars($clean);
+    }
+} else {
+    for ($i = 1; $i <= 4; $i++) {
+        $key = "exp_{$i}";
+        $val = $edit_mode ? (isset($d->$key) ? trim($d->$key) : '') : '';
+        if ($val !== '') $experiences[] = htmlspecialchars($val);
+    }
+}
+if (empty($experiences)) $experiences = [''];
+?>
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary:   #1a1a2e;
+    --accent:    #f2be00;
+    --accent2:   #0f3460;
+    --surface:   #ffffff;
+    --surface2:  #f7f8fc;
+    --border:    #e2e5ef;
+    --text:      #1a1a2e;
+    --muted:     #6b7280;
+    --success:   #10b981;
+    --danger:    #ef4444;
+    --radius:    12px;
+    --shadow:    0 4px 24px rgba(26,26,46,.08);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  
+</style>
+
+
+<!-- ── Page Header ── -->
+<div class="page-header">
+  <h1>
+    <?php if ($edit_mode): ?>
+      Modifier l'offre <span>#<?= htmlspecialchars($d->ID) ?></span>
+    <?php else: ?>
+      Nouvelle <span>offre d'emploi</span>
+    <?php endif; ?>
+  </h1>
+  <div class="header-actions">
+    <a href="<?= DNADMIN ?>/app/serie/list" class="btn-back">
+      <i class="fa fa-arrow-left"></i> Liste des offres
+    </a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Bootstrap layout: steps col-12 top, form col-8
+     ══════════════════════════════════════════════════ -->
+<div class="container-fluid" style="padding: 28px 20px 80px; max-width: 1140px;">
+
+  <!-- Steps bar — col-md-12 full width -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="vf-steps-card" id="steps-sidebar">
+        <div class="vf-steps-header">
+          <div class="vf-steps-header-left">
+            <p>Progression</p>
+            <h3><?= $edit_mode ? 'Modifier l\'offre' : 'Nouvelle offre' ?></h3>
+          </div>
+          <div class="vf-progress-inline">
+            <div class="vf-progress-track">
+              <div class="vf-progress-fill" id="progress-fill"></div>
             </div>
-            <div class="col-xs-12 col-sm-4 hidden-xs">
-                <!-- Main search form -->
-                <form action="#" method="get" class="mainsearch-form">
-                    <div class="input-group">
-                        <input type="text" name="q" class="form-control" placeholder="Search...">
-                        <span class="input-group-btn">
-                            <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i></button>
-                        </span>
-                    </div>
-                </form>
-            </div>
+            <span class="vf-progress-pct" id="progress-pct">25%</span>
+          </div>
         </div>
-    </div>
-</section>
-<section class="content-header navbar_header">
-    <div>
-        <nav class="navbar navbar-static-top navbar_content" role="navigation">
-            <!-- Sidebar toggle button-->
-            <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
-                <span class="sr-only">Toggle navigation</span>
-            </a>
-            <!-- Navbar Right Menu -->
-            <div class="navbar-branch-menu">
-                <ul class="nav navbar-nav">
 
-                    <li class="dropdown notifications-menu">
-                        <a href="<?= DNADMIN ?>/app/serie/list"><i class="fa fa-chevron-left"></i> Retour</a>
-                    </li>
+        <div class="vf-steps-list">
 
-
-
-                    <li class="dropdown notifications-menu">
-                        <a href="<?= DNADMIN ?>/app/serie/new"><i class="fa fa-plus"></i>Ajouter nouveau</a>
-                    </li>
-
-
-                </ul>
+          <div class="vf-step active" data-step="1" onclick="goToStep(1)">
+            <div class="vf-step-num">1</div>
+            <div class="vf-step-info">
+              <div class="vf-step-label">Poste</div>
+              <div class="vf-step-sub">Titre, entreprise, logo</div>
             </div>
-        </nav>
-    </div>
-</section>
+            <i class="fa fa-check vf-step-check"></i>
+          </div>
+
+          <div class="vf-step" data-step="2" onclick="goToStep(2)">
+            <div class="vf-step-num">2</div>
+            <div class="vf-step-info">
+              <div class="vf-step-label">Compétences</div>
+              <div class="vf-step-sub">Skills &amp; expériences</div>
+            </div>
+            <i class="fa fa-check vf-step-check"></i>
+          </div>
+
+          <div class="vf-step" data-step="3" onclick="goToStep(3)">
+            <div class="vf-step-num">3</div>
+            <div class="vf-step-info">
+              <div class="vf-step-label">Descriptions</div>
+              <div class="vf-step-sub">Accroche &amp; détails</div>
+            </div>
+            <i class="fa fa-check vf-step-check"></i>
+          </div>
+
+          <div class="vf-step" data-step="4" onclick="goToStep(4)">
+            <div class="vf-step-num">4</div>
+            <div class="vf-step-info">
+              <div class="vf-step-label">Paramètres</div>
+              <div class="vf-step-sub">Visibilité &amp; publication</div>
+            </div>
+            <i class="fa fa-check vf-step-check"></i>
+          </div>
 
-<!-- Main content -->
-<section class="content">
-
-    <!-- Small boxes (Stat box) -->
-    <div class="row">
-        <div class="col-sm-10 col-md-8">
-            <form method="post" id="reg-form" class="form-horizontal" enctype="multipart/form-data">
-                <!--RECENT NEW PARTICIPANT -->
-                <div class="box box-info">
-                    <!-- /.box-header -->
-                    <div class="box-header ui-sortable-handle" style="cursor: move;">
-                        <i class="fa fa fa-ellipsis-v"></i>
-
-                        <h3 class="box-title">Nouveau poste</h3>
-
-                        <div class="box-tools pull-right" data-toggle="tooltip" title="Status">
-                            <div class="btn-group" data-toggle="btn-toggle">
-
-                            </div>
-                        </div>
-                    </div>
-                    <br>
-                    <?php if ($form->ERRORS && (@$form->ERRORS_SCRIPT['email'][0] == 'NOTUNIQUE' || @$form->ERRORS_SCRIPT['document_number'][0] == 'NOTUNIQUE')) { ?>
-
-                        <div class="box-body" style="padding: 10px 25px 10px 25px; ">
-                            <?php include 'email_used' . PL; ?>
-                        </div>
-                    <?php } else { ?>
-
-                        <div class="box-body" style="padding: 10px 25px 10px 25px; ">
-                            <fieldset class="panel-reg">
-
-
-                                <div class="form-group">
-                                    <div class="col-sm-12">
-                                        <h4 class="fieldset-header">Informations sur le poste <span class="req"></span></h4>
-                                        <hr class="halfLine">
-                                    </div>
-                                </div>
-
-
-                                <br/>
-
-                                <div class="form-group">
-                                    <label class="control-label col-sm-3" for="serie_title">Titre du poste vacant
- 
-                                        <span  class="req">*</span>  
-                                        <span style="color: red; font-size: 12px; display: block"> <?php if ($form->ERRORS) { echo @$form->ERRORS_SCRIPT['serie_title'][0]; } ?> </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="register-serie_title" id="serie_title" placeholder="Titre du poste" 
-    <?php if ($form->ERRORS && Input::get('register-serie_title', 'post')) { ?> value="<?php echo Input::get('register-serie_title', 'post'); ?>" <?php } ?>  required="required" maxlength="50">
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="control-label col-sm-3" for="serie_title">Nom de l'entreprise
-                                        <span  class="req">*</span>  
-                                        <span style="color: red; font-size: 12px; display: block"> <?php if ($form->ERRORS) { echo @$form->ERRORS_SCRIPT['company_name'][0]; } ?> </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="register-company_name" id="company_name" placeholder="Nom de l'entreprise" 
-    <?php if ($form->ERRORS && Input::get('register-company_name', 'post')) { ?> value="<?php echo Input::get('register-company_name', 'post'); ?>" <?php } ?>  required="required" maxlength="50">
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="control-label col-sm-3" for="serie_title">Type d'emploi
-                                        <span  class="req">*</span>  
-                                        <span style="color: red; font-size: 12px; display: block"> <?php if ($form->ERRORS) { echo @$form->ERRORS_SCRIPT['serie_title'][0]; } ?> </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                            <select name="register-job_type" id="job_type" class="form-control bordered" required="required">
-
-                                            <option value="" selected>Sélectionnez ici</option>
-                                            <option value="tempsplein" <?php if ($form->ERRORS && Input::get('register-job_type', 'post') == 'NEW') {echo 'selected="selected"';} ?>>Temps plein</option>
-                                            <option value="tempspartiel" <?php if ($form->ERRORS && Input::get('register-job_type', 'post') == 'NEW') {echo 'selected="selected"';} ?>>Temps partiel</option>
-
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <div class="col-sm-12">
-                                        <h4 class="fieldset-header">Informations sur les Compétences <span class="req"></span></h4>
-                                        <hr class="halfLine">
-                                    </div>
-                                </div>
-                                
-                                <!-- Input 1 -->
-                                <div class="form-group">
-                                    <label class="control-label col-sm-3" for="comp_1">Compétences 1
-                                        <span class="req">*</span>
-                                        <span style="color: red; font-size: 12px; display: block">
-                                            <?php if ($form->ERRORS) { echo @$form->ERRORS_SCRIPT['comp_1'][0]; } ?>
-                                        </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="register-comp_1" id="comp_1" placeholder="Compétences 1"
-                                        <?php if ($form->ERRORS && Input::get('register-comp_1', 'post')) { ?> value="<?php echo Input::get('register-comp_1', 'post'); ?>" <?php } ?>
-                                        required="required" maxlength="50">
-                                    </div>
-                                </div>
-
-                                <!-- Input 2 -->
-                                <div class="form-group">
-                                    <label class="control-label col-sm-3" for="comp_2">Compétences 2
-                                        <span class="req">*</span>
-                                        <span style="color: red; font-size: 12px; display: block">
-                                            <?php if ($form->ERRORS) { echo @$form->ERRORS_SCRIPT['comp_2'][0]; } ?>
-                                        </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="register-comp_2" id="comp_2" placeholder="Compétences 2"
-                                        <?php if ($form->ERRORS && Input::get('register-comp_2', 'post')) { ?> value="<?php echo Input::get('register-comp_2', 'post'); ?>" <?php } ?>
-                                        required="required" maxlength="50">
-                                    </div>
-                                </div>
-
-                                <!-- Input 3 -->
-                                <div class="form-group">
-                                    <label class="control-label col-sm-3" for="comp_3">Compétences 3
-                                        <span class="req">*</span>
-                                        <span style="color: red; font-size: 12px; display: block">
-                                            <?php if ($form->ERRORS) { echo @$form->ERRORS_SCRIPT['comp_3'][0]; } ?>
-                                        </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="register-comp_3" id="comp_3" placeholder="Compétences 3"
-                                        <?php if ($form->ERRORS && Input::get('register-comp_3', 'post')) { ?> value="<?php echo Input::get('register-comp_3', 'post'); ?>" <?php } ?>
-                                        required="required" maxlength="50">
-                                    </div>
-                                </div>
-
-                                <!-- Input 4 -->
-                                <div class="form-group">
-                                    <label class="control-label col-sm-3" for="comp_4">Compétences 4
-                                        <span class="req">*</span>
-                                        <span style="color: red; font-size: 12px; display: block">
-                                            <?php if ($form->ERRORS) { echo @$form->ERRORS_SCRIPT['comp_4'][0]; } ?>
-                                        </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="register-comp_4" id="comp_4" placeholder="Compétences 4"
-                                        <?php if ($form->ERRORS && Input::get('register-comp_4', 'post')) { ?> value="<?php echo Input::get('register-comp_4', 'post'); ?>" <?php } ?>
-                                        required="required" maxlength="50">
-                                    </div>
-                                </div>
-
-                                <!-- Input 5 -->
-                                <div class="form-group">
-                                    <label class="control-label col-sm-3" for="comp_5">Compétences 5
-                                        <span class="req">*</span>
-                                        <span style="color: red; font-size: 12px; display: block">
-                                            <?php if ($form->ERRORS) { echo @$form->ERRORS_SCRIPT['comp_5'][0]; } ?>
-                                        </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="register-comp_5" id="comp_5" placeholder="Compétences 5"
-                                        <?php if ($form->ERRORS && Input::get('register-comp_5', 'post')) { ?> value="<?php echo Input::get('register-comp_5', 'post'); ?>" <?php } ?>
-                                        required="required" maxlength="50">
-                                    </div>
-                                </div>
-
-                                <!-- Input 6 -->
-                                <div class="form-group">
-                                    <label class="control-label col-sm-3" for="comp_6">Compétences 6
-                                        <span class="req">*</span>
-                                        <span style="color: red; font-size: 12px; display: block">
-                                            <?php if ($form->ERRORS) { echo @$form->ERRORS_SCRIPT['comp_6'][0]; } ?>
-                                        </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="register-comp_6" id="comp_6" placeholder="Compétences 6"
-                                        <?php if ($form->ERRORS && Input::get('register-comp_6', 'post')) { ?> value="<?php echo Input::get('register-comp_6', 'post'); ?>" <?php } ?>
-                                        required="required" maxlength="50">
-                                    </div>
-                                </div>
-
-                                <!-- Input 7 -->
-                                <div class="form-group">
-                                    <label class="control-label col-sm-3" for="comp_7">Compétences 7
-                                        <span class="req">*</span>
-                                        <span style="color: red; font-size: 12px; display: block">
-                                            <?php if ($form->ERRORS) { echo @$form->ERRORS_SCRIPT['comp_7'][0]; } ?>
-                                        </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="register-comp_7" id="comp_7" placeholder="Compétences 7"
-                                        <?php if ($form->ERRORS && Input::get('register-comp_7', 'post')) { ?> value="<?php echo Input::get('register-comp_7', 'post'); ?>" <?php } ?>
-                                        required="required" maxlength="50">
-                                    </div>
-                                </div>
-
-                                 <div class="form-group">
-                                    <div class="col-sm-12">
-                                        <h4 class="fieldset-header">Informations sur l'Éducation et Les Expériences  <span class="req"></span></h4>
-                                        <hr class="halfLine">
-                                    </div>
-                                </div>
-
-                                <!-- Éducation -->
-                                <div class="form-group">
-                                    <label class="control-label col-sm-3" for="education">Éducation
-                                        <span class="req">*</span>
-                                        <span style="color: red; font-size: 12px; display: block">
-                                            <?php if ($form->ERRORS) { echo @$form->ERRORS_SCRIPT['education'][0]; } ?>
-                                        </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="register-education" id="education" placeholder="Éducation"
-                                        <?php if ($form->ERRORS && Input::get('register-education', 'post')) { ?> value="<?php echo Input::get('register-education', 'post'); ?>" <?php } ?>
-                                        required="required" maxlength="100">
-                                    </div>
-                                </div>
-
-                                <!-- Expérience 1 -->
-                                <div class="form-group">
-                                    <label class="control-label col-sm-3" for="exp_1">Expérience 1
-                                        <span class="req">*</span>
-                                        <span style="color: red; font-size: 12px; display: block">
-                                            <?php if ($form->ERRORS) { echo @$form->ERRORS_SCRIPT['exp_1'][0]; } ?>
-                                        </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="register-exp_1" id="exp_1" placeholder="Expérience 1"
-                                        <?php if ($form->ERRORS && Input::get('register-exp_1', 'post')) { ?> value="<?php echo Input::get('register-exp_1', 'post'); ?>" <?php } ?>
-                                        required="required" maxlength="100">
-                                    </div>
-                                </div>
-
-                                <!-- Expérience 2 -->
-                                <div class="form-group">
-                                    <label class="control-label col-sm-3" for="exp_2">Expérience 2
-                                        <span class="req">*</span>
-                                        <span style="color: red; font-size: 12px; display: block">
-                                            <?php if ($form->ERRORS) { echo @$form->ERRORS_SCRIPT['exp_2'][0]; } ?>
-                                        </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="register-exp_2" id="exp_2" placeholder="Expérience 2"
-                                        <?php if ($form->ERRORS && Input::get('register-exp_2', 'post')) { ?> value="<?php echo Input::get('register-exp_2', 'post'); ?>" <?php } ?>
-                                        required="required" maxlength="100">
-                                    </div>
-                                </div>
-
-                                <!-- Expérience 3 -->
-                                <div class="form-group">
-                                    <label class="control-label col-sm-3" for="exp_3">Expérience 3
-                                        <span class="req">*</span>
-                                        <span style="color: red; font-size: 12px; display: block">
-                                            <?php if ($form->ERRORS) { echo @$form->ERRORS_SCRIPT['exp_3'][0]; } ?>
-                                        </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="register-exp_3" id="exp_3" placeholder="Expérience 3"
-                                        <?php if ($form->ERRORS && Input::get('register-exp_3', 'post')) { ?> value="<?php echo Input::get('register-exp_3', 'post'); ?>" <?php } ?>
-                                        required="required" maxlength="100">
-                                    </div>
-                                </div>
-
-                                <!-- Expérience 4 -->
-                                <div class="form-group">
-                                    <label class="control-label col-sm-3" for="exp_4">Expérience 4
-                                        <span class="req">*</span>
-                                        <span style="color: red; font-size: 12px; display: block">
-                                            <?php if ($form->ERRORS) { echo @$form->ERRORS_SCRIPT['exp_4'][0]; } ?>
-                                        </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="register-exp_4" id="exp_4" placeholder="Expérience 4"
-                                        <?php if ($form->ERRORS && Input::get('register-exp_4', 'post')) { ?> value="<?php echo Input::get('register-exp_4', 'post'); ?>" <?php } ?>
-                                        required="required" maxlength="100">
-                                    </div>
-                                </div>
-
-
-                                <div class="form-group">
-                                    <div class="col-sm-12">
-                                        <h4 class="fieldset-header">Descriptions  <span class="req"></span></h4>
-                                        <hr class="halfLine">
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="control-label col-sm-3" for="serie_description"> Courte description 
-                                        <span  class="req"></span>  
-                                        <span style="color: red; font-size: 12px; display: block"> <?php if ($form->ERRORS) {
-        echo @$form->ERRORS_SCRIPT['serie_description'][0];
-    } ?> </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <textarea type="text" class="form-control" name="register-serie_description" id="serie_description" rows="5" cols="40" maxlength="150" placeholder="Courte description..." ><?php if ($form->ERRORS && Input::get('register-serie_description', 'post')) { ?> <?php echo Input::get('register-serie_description', 'post'); ?> <?php } ?></textarea>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label col-sm-3" for="dtserie_description"> Description détaillée 
-                                        <span  class="req"></span>  
-                                        <span style="color: red; font-size: 12px; display: block"> <?php if ($form->ERRORS) {
-        echo @$form->ERRORS_SCRIPT['dtserie_description'][0];
-    } ?> </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <textarea type="text"  class="form-control" name="register-dtserie_description" id="dtserie_description" placeholder="Description détaillée ..." style="height: 180px;"><?php if ($form->ERRORS && Input::get('register-serie_description', 'post')) { ?> <?php echo Input::get('register-serie_description', 'post'); ?> <?php } ?></textarea>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="control-label col-sm-3" for="featuredImageInner">Logo d’entreprise
-                                        <span  class="req">*</span> 
-                                        <span style="color: red; font-size: 12px; display: block"> <?php if ($form->ERRORS) {
-        echo @$form->ERRORS_SCRIPT['featuredImage'][0];
-    } ?> </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <div class="fileinput fileinput-new" id="featuredImageInner" data-provides="fileinput">
-                                            <div class="fileinput-preview thumbnail" data-trigger="fileinput"></div>
-                                            <div>
-                                                <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span>
-                                                    <input id="featuredImage" type="file" name="featuredImage" required="required"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                                <div class="form-group">
-                                    <div class="col-sm-12">
-                                        <h4 class="fieldset-header">Setting Information <span class="req"></span></h4>
-                                        <hr class="halfLine">
-                                    </div>
-                                </div>
-
-                               
-
-                                <div class="form-group">
-                                    <label class="control-label col-sm-3" for="package">Lieu du poste
-                                        <span  class="req">*</span> 
-                                        <span style="color: red; font-size: 12px; display: block"> <?php if ($form->ERRORS) {
-                                            echo @$form->ERRORS_SCRIPT['package'][0];
-                                        } ?> </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <select name="register-package" id="package" class="form-control bordered" required="required">
-                                            <option value="" <?php if ($form->ERRORS && Input::get('register-package', 'post') == '') {
-                                            echo 'selected="selected"';
-                                        } ?>> [--Select--] </option>
-                                        <option value="Normal_Blog">La page des postes</option>
-                                        <option value="To_home_Page">None</option>
-   
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="control-label col-sm-3" for="package_type">Type
-                                        <span  class="req">*</span> 
-                                        <span style="color: red; font-size: 12px; display: block"> <?php if ($form->ERRORS) { echo @$form->ERRORS_SCRIPT['package_type'][0]; } ?> </span>
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <select name="register-package_type" id="package_type" class="form-control bordered" required="required">
-                                            <option value="" <?php if ($form->ERRORS && Input::get('register-package_type', 'post') == '') { echo 'selected="selected"';} ?>> [--Select--] </option>
-
-                                            <option value="Public" <?php if ($form->ERRORS && Input::get('register-package_type', 'post') == 'NEW') {echo 'selected="selected"';} ?>>Publique</option>
-
-                                            <option value="Private" <?php if ($form->ERRORS && Input::get('register-package_type', 'post') == 'USED') { echo 'selected="selected"';} ?>>Privée</option>
-
-                                        </select>
-                                    </div>
-                                </div>
-
-
-                            </fieldset>
-                        </div>
-                        <!-- /.box-body -->
-                        <div class="box-footer clearfix">
-
-
-
-                            <a href="<?= DNADMIN ?>/app/serie/list" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> Annuler</a>
-
-
-                            <script>
-
-                                var is_chrome = navigator.userAgent.indexOf('Chrome') > -1;
-                                var is_explorer = navigator.userAgent.indexOf('MSIE') > -1;
-                                var is_firefox = navigator.userAgent.indexOf('Firefox') > -1;
-                                var is_safari = navigator.userAgent.indexOf("Safari") > -1;
-                                var is_opera = navigator.userAgent.toLowerCase().indexOf("op") > -1;
-                                if ((is_chrome) && (is_safari)) {
-                                    is_safari = false;
-                                }
-                                if ((is_chrome) && (is_opera)) {
-                                    is_chrome = false;
-                                }
-
-                                if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
-                                    $('.submit_btn').on('click', function (e) {
-                                        $('.submit_btn .loading_icon').css({'display': 'inline-block'});
-                                        $('.submit_btn .glyphicon').css({'display': 'none'});
-                                    });
-                                } else {
-                                    $('#reg-form').on('submit', function (e) {
-                                        $('.submit_btn .loading_icon').css({'display': 'inline-block'});
-                                        $('.submit_btn .glyphicon').css({'display': 'none'});
-                                    });
-                                }
-
-                            </script>
-
-
-                            <input type="hidden" name="request" value="serie-new">
-                            <input type="hidden" name="webToken" value="<?= Config::get('time/seconds'); ?>">
-                            <input type="hidden" name="register_submited" value="1">
-                            <input type="hidden" name="register-event_token" value="de220168957bd2ccff08f88e9939b95f">
-
-                            <button type="submit" class="submit_btn btn btn-sm btn-info btn-flat pull-right"> <img class="loading_icon" src="<?= DNADMIN ?>/img/loading.gif" style="width: 14px; display: none"> <i class="glyphicon glyphicon-share"></i> Soumettre</button>
-
-
-
-
-                            <script>
-
-                                var is_chrome = navigator.userAgent.indexOf('Chrome') > -1;
-                                var is_explorer = navigator.userAgent.indexOf('MSIE') > -1;
-                                var is_firefox = navigator.userAgent.indexOf('Firefox') > -1;
-                                var is_safari = navigator.userAgent.indexOf("Safari") > -1;
-                                var is_opera = navigator.userAgent.toLowerCase().indexOf("op") > -1;
-                                if ((is_chrome) && (is_safari)) {
-                                    is_safari = false;
-                                }
-                                if ((is_chrome) && (is_opera)) {
-                                    is_chrome = false;
-                                }
-
-                                if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
-                                    $('.submit_btn').on('click', function (e) {
-                                        $('.submit_btn .loading_icon').css({'display': 'inline-block'});
-                                        $('.submit_btn .glyphicon').css({'display': 'none'});
-                                    });
-                                } else {
-                                    $('#reg-form').on('submit', function (e) {
-                                        $('.submit_btn .loading_icon').css({'display': 'inline-block'});
-                                        $('.submit_btn .glyphicon').css({'display': 'none'});
-                                    });
-                                }
-
-                            </script>
-
-                        </div>
-
-
-<?php } ?>
-
-                    <!-- /.box-footer -->
-                </div>
-                <!--END NEW PARTICIPANT-->
-            </form>
         </div>
-        <div class="col-sm-1 col-md-2"></div>
+      </div>
+    </div><!-- /.col-md-12 -->
+  </div><!-- /.row steps -->
 
-    </div><!-- /.row -->
+  <!-- Form — col-md-8 left-aligned -->
+  <div class="row" style="margin-top: 4px;">
+    <div class="col-md-8">
 
 
-</section>
 
+    <?php if (!empty($_SESSION['success'])): ?>
+      <div class="alert alert-success" style="margin-bottom:16px">
+        <i class="fa fa-check-circle"></i>
+        <?= htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?>
+      </div>
+    <?php endif; ?>
 
+    <?php if (!empty($_SESSION['errors'])): ?>
+      <div class="alert alert-error" style="margin-bottom:16px">
+        <i class="fa fa-exclamation-circle"></i>
+        <?= htmlspecialchars($_SESSION['errors']); unset($_SESSION['errors']); ?>
+      </div>
+    <?php endif; ?>
 
+    <form method="post" id="vacancy-form" enctype="multipart/form-data" novalidate>
+      <input type="hidden" name="request"           value="<?= $edit_mode ? 'serie-edit' : 'serie-new' ?>">
+      <input type="hidden" name="webToken"          value="<?= Config::get('time/seconds') ?>">
+      <input type="hidden" name="register_submited" value="1">
+      <?php if ($edit_mode): ?>
+      <input type="hidden" name="serie_id"          value="<?= (int)$d->ID ?>">
+      <?php endif; ?>
+
+      <!-- ─────────────────────────────────────────
+           STEP 1 — Job Information
+      ─────────────────────────────────────────── -->
+      <div class="card active" id="step-1">
+        <div class="card-header">
+          <div class="card-header-icon"><i class="fa fa-briefcase"></i></div>
+          <div>
+            <h2>Informations sur le poste</h2>
+            <p>Titre, entreprise, type de contrat</p>
+          </div>
+        </div>
+        <div class="card-body">
+
+          <div class="field-row">
+            <div class="field-group">
+              <label for="serie_title">
+                Titre du poste <span class="req">*</span>
+                <?php if (isset($form) && $form->ERRORS): ?>
+                  <span class="err-msg"><?= htmlspecialchars(@$form->ERRORS_SCRIPT['serie_title'][0]) ?></span>
+                <?php endif; ?>
+              </label>
+              <input type="text" id="serie_title" name="register-serie_title"
+                     placeholder="Ex: Développeur Full-Stack Senior"
+                     value="<?= old('serie_title', $d->serie_title ?? '') ?>"
+                     maxlength="150" required>
+            </div>
+            <div class="field-group">
+              <label for="company_name">
+                Nom de l'entreprise <span class="req">*</span>
+                <?php if (isset($form) && $form->ERRORS): ?>
+                  <span class="err-msg"><?= htmlspecialchars(@$form->ERRORS_SCRIPT['company_name'][0]) ?></span>
+                <?php endif; ?>
+              </label>
+              <input type="text" id="company_name" name="register-company_name"
+                     placeholder="Ex: Kigali Tech Ltd"
+                     value="<?= old('company_name', $d->company_name ?? '') ?>"
+                     maxlength="150" required>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label for="job_type">
+                Type d'emploi <span class="req">*</span>
+                <?php if (isset($form) && $form->ERRORS): ?>
+                  <span class="err-msg"><?= htmlspecialchars(@$form->ERRORS_SCRIPT['job_type'][0]) ?></span>
+                <?php endif; ?>
+              </label>
+              <select id="job_type" name="register-job_type" required>
+                <option value="">— Sélectionnez —</option>
+                <?php
+                $jobTypes = [
+                  'tempsplein'    => 'Temps plein',
+                  'tempspartiel'  => 'Temps partiel',
+                  'freelance'     => 'Freelance / Consultant',
+                  'stage'         => 'Stage',
+                  'interim'       => 'Intérim',
+                  'apprentissage' => 'Apprentissage',
+                ];
+                $sel_jt = old('job_type', $d->job_type ?? '');
+                foreach ($jobTypes as $val => $label):
+                ?>
+                  <option value="<?= $val ?>" <?= $sel_jt === $val ? 'selected' : '' ?>><?= $label ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            <div class="field-group">
+              <label for="language">Langue de l'annonce</label>
+              <select id="language" name="register-language">
+                <?php
+                $langs    = ['KINYARWANDA' => 'Kinyarwanda', 'FRANCAIS' => 'Français', 'ENGLISH' => 'English'];
+                $sel_lang = old('language', $d->language ?? 'KINYARWANDA');
+                foreach ($langs as $val => $label):
+                ?>
+                  <option value="<?= $val ?>" <?= $sel_lang === $val ? 'selected' : '' ?>><?= $label ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group" style="margin-top:8px">
+            <label for="featuredImage">
+              Logo de l'entreprise <span class="req">*</span>
+            </label>
+            <?php if ($edit_mode && !empty($d->photo)): ?>
+            <div class="existing-photo">
+              <img src="<?= DNADMIN . '/' . htmlspecialchars($d->photo) ?>" alt="Logo actuel">
+              <span>Logo actuel — téléversez une nouvelle image pour remplacer</span>
+            </div>
+            <?php endif; ?>
+            <div class="upload-zone" id="upload-zone">
+              <input type="file" name="featuredImage" id="featuredImage"
+                     accept="image/png,image/jpeg,image/gif"
+                     <?= $edit_mode ? '' : 'required' ?>>
+              <div class="icon"><i class="fa fa-cloud-upload-alt"></i></div>
+              <div class="upload-text">Glissez une image ici, ou <strong>cliquez pour parcourir</strong></div>
+              <div class="upload-hint">PNG, JPG, GIF · Max 5 Mo</div>
+            </div>
+            <div class="upload-preview" id="upload-preview">
+              <img id="preview-img" src="" alt="Prévisualisation">
+            </div>
+          </div>
+
+        </div>
+        <div class="form-actions">
+          <a href="<?= DNADMIN ?>/app/serie/list" class="btn btn-outline">
+            <i class="fa fa-times btn-icon"></i> Annuler
+          </a>
+          <button type="button" class="btn btn-primary" onclick="nextStep(1)">
+            Suivant <i class="fa fa-arrow-right btn-icon"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ─────────────────────────────────────────
+           STEP 2 — Competences & Experience
+      ─────────────────────────────────────────── -->
+      <div class="card" id="step-2">
+        <div class="card-header">
+          <div class="card-header-icon"><i class="fa fa-star"></i></div>
+          <div>
+            <h2>Compétences & Expériences</h2>
+            <p>Ajoutez, supprimez ou réordonnez librement</p>
+          </div>
+        </div>
+        <div class="card-body">
+
+          <div class="section-divider"><span>Compétences requises</span></div>
+          <div class="dynamic-list" id="competences-list">
+            <?php foreach (array_values($competences) as $idx => $val): ?>
+            <div class="dynamic-item" draggable="true">
+              <span class="drag-handle"><i class="fa fa-grip-vertical"></i></span>
+              <span class="item-num"><?= $idx + 1 ?></span>
+              <input type="text" name="register-competences[]"
+                     placeholder="Ex: Maîtrise de JavaScript"
+                     value="<?= htmlspecialchars($val) ?>" maxlength="250">
+              <button type="button" class="btn-remove-item"
+                      onclick="removeItem(this,'competences-list')" title="Supprimer">
+                <i class="fa fa-times"></i>
+              </button>
+            </div>
+            <?php endforeach; ?>
+          </div>
+          <button type="button" class="btn-add-item"
+                  onclick="addItem('competences-list','register-competences[]','Compétences')">
+            <i class="fa fa-plus"></i> Ajouter une compétence
+          </button>
+          <div class="list-limit-note">
+            <i class="fa fa-info-circle"></i> Maximum 7 compétences. Au moins 1 requise.
+          </div>
+
+          <div class="section-divider" style="margin-top:28px"><span>Éducation</span></div>
+          <div class="field-row full">
+            <div class="field-group">
+              <label for="education">
+                Niveau d'éducation requis <span class="req">*</span>
+                <?php if (isset($form) && $form->ERRORS): ?>
+                  <span class="err-msg"><?= htmlspecialchars(@$form->ERRORS_SCRIPT['education'][0]) ?></span>
+                <?php endif; ?>
+              </label>
+              <input type="text" id="education" name="register-education"
+                     placeholder="Ex: Licence en Informatique ou équivalent"
+                     value="<?= old('education', $d->education ?? '') ?>"
+                     maxlength="250" required>
+            </div>
+          </div>
+
+          <div class="section-divider" style="margin-top:10px"><span>Expériences requises</span></div>
+          <div class="dynamic-list" id="experiences-list">
+            <?php foreach (array_values($experiences) as $idx => $val): ?>
+            <div class="dynamic-item" draggable="true">
+              <span class="drag-handle"><i class="fa fa-grip-vertical"></i></span>
+              <span class="item-num"><?= $idx + 1 ?></span>
+              <input type="text" name="register-experiences[]"
+                     placeholder="Ex: 3 ans d'expérience en développement web"
+                     value="<?= htmlspecialchars($val) ?>" maxlength="250">
+              <button type="button" class="btn-remove-item"
+                      onclick="removeItem(this,'experiences-list')" title="Supprimer">
+                <i class="fa fa-times"></i>
+              </button>
+            </div>
+            <?php endforeach; ?>
+          </div>
+          <button type="button" class="btn-add-item"
+                  onclick="addItem('experiences-list','register-experiences[]','Expériences')">
+            <i class="fa fa-plus"></i> Ajouter une expérience
+          </button>
+          <div class="list-limit-note">
+            <i class="fa fa-info-circle"></i> Maximum 4 expériences. Au moins 1 requise.
+          </div>
+
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" onclick="prevStep(2)">
+            <i class="fa fa-arrow-left btn-icon"></i> Précédent
+          </button>
+          <button type="button" class="btn btn-primary" onclick="nextStep(2)">
+            Suivant <i class="fa fa-arrow-right btn-icon"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ─────────────────────────────────────────
+           STEP 3 — Descriptions
+      ─────────────────────────────────────────── -->
+      <div class="card" id="step-3">
+        <div class="card-header">
+          <div class="card-header-icon"><i class="fa fa-align-left"></i></div>
+          <div>
+            <h2>Descriptions</h2>
+            <p>Courte accroche et détails complets du poste</p>
+          </div>
+        </div>
+        <div class="card-body">
+
+          <div class="field-group" style="margin-bottom:16px">
+            <label for="serie_description">
+              Courte description (accroche) <span class="req">*</span>
+              <?php if (isset($form) && $form->ERRORS): ?>
+                <span class="err-msg"><?= htmlspecialchars(@$form->ERRORS_SCRIPT['serie_description'][0]) ?></span>
+              <?php endif; ?>
+            </label>
+            <textarea id="serie_description" name="register-serie_description"
+                      maxlength="300" rows="3"
+                      placeholder="Résumé accrocheur visible dans la liste (max 300 caractères)..."><?= old('serie_description', $d->serie_description ?? '') ?></textarea>
+            <div class="char-counter" id="cc-short">0 / 300</div>
+          </div>
+
+          <div class="field-group">
+            <label for="dtserie_description">Description détaillée</label>
+            <textarea id="dtserie_description" name="register-dtserie_description"
+                      rows="8"
+                      placeholder="Description complète du poste, missions, avantages, conditions..."><?= old('dtserie_description', $d->dtserie_description ?? '') ?></textarea>
+            <div class="char-counter" id="cc-long">0 / ∞</div>
+          </div>
+
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" onclick="prevStep(3)">
+            <i class="fa fa-arrow-left btn-icon"></i> Précédent
+          </button>
+          <button type="button" class="btn btn-primary" onclick="nextStep(3)">
+            Suivant <i class="fa fa-arrow-right btn-icon"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ─────────────────────────────────────────
+           STEP 4 — Settings & Review
+      ─────────────────────────────────────────── -->
+      <div class="card" id="step-4">
+        <div class="card-header">
+          <div class="card-header-icon"><i class="fa fa-cog"></i></div>
+          <div>
+            <h2>Paramètres & Publication</h2>
+            <p>Visibilité, emplacement et soumission</p>
+          </div>
+        </div>
+        <div class="card-body">
+
+          <div class="field-row">
+            <div class="field-group">
+              <label for="package">
+                Emplacement <span class="req">*</span>
+                <?php if (isset($form) && $form->ERRORS): ?>
+                  <span class="err-msg"><?= htmlspecialchars(@$form->ERRORS_SCRIPT['package'][0]) ?></span>
+                <?php endif; ?>
+              </label>
+              <select id="package" name="register-package" required>
+                <option value="">— Sélectionnez —</option>
+                <?php
+                $packages = ['Normal_Blog' => 'Page des offres', 'To_home_Page' => 'Page d\'accueil'];
+                $sel_pkg  = old('package', $d->package ?? '');
+                foreach ($packages as $val => $label):
+                ?>
+                  <option value="<?= $val ?>" <?= $sel_pkg === $val ? 'selected' : '' ?>><?= $label ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            <div class="field-group">
+              <label for="package_type">
+                Visibilité <span class="req">*</span>
+                <?php if (isset($form) && $form->ERRORS): ?>
+                  <span class="err-msg"><?= htmlspecialchars(@$form->ERRORS_SCRIPT['package_type'][0]) ?></span>
+                <?php endif; ?>
+              </label>
+              <select id="package_type" name="register-package_type" required>
+                <option value="">— Sélectionnez —</option>
+                <?php
+                $ptypes = ['Public' => 'Publique', 'Private' => 'Privée'];
+                $sel_pt = old('package_type', $d->package_type ?? '');
+                foreach ($ptypes as $val => $label):
+                ?>
+                  <option value="<?= $val ?>" <?= $sel_pt === $val ? 'selected' : '' ?>><?= $label ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+
+          <div class="section-divider" style="margin-top:20px"><span>Récapitulatif</span></div>
+          <div class="review-grid" id="review-summary">
+            <div class="review-item">
+              <label>Titre du poste</label>
+              <div class="value" id="rv-title">—</div>
+            </div>
+            <div class="review-item">
+              <label>Entreprise</label>
+              <div class="value" id="rv-company">—</div>
+            </div>
+            <div class="review-item">
+              <label>Type d'emploi</label>
+              <div class="value" id="rv-jobtype">—</div>
+            </div>
+            <div class="review-item">
+              <label>Langue</label>
+              <div class="value" id="rv-lang">—</div>
+            </div>
+            <div class="review-item" style="grid-column:1/-1">
+              <label>Compétences</label>
+              <div class="review-tags" id="rv-comps"></div>
+            </div>
+            <div class="review-item" style="grid-column:1/-1">
+              <label>Expériences</label>
+              <div class="review-tags" id="rv-exps"></div>
+            </div>
+          </div>
+
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" onclick="prevStep(4)">
+            <i class="fa fa-arrow-left btn-icon"></i> Précédent
+          </button>
+          <button type="submit" class="btn btn-primary btn-lg" id="submit-btn">
+            <span class="spinner"></span>
+            <i class="fa fa-paper-plane btn-icon"></i>
+            <?= $edit_mode ? 'Mettre à jour' : 'Publier l\'offre' ?>
+          </button>
+        </div>
+      </div>
+
+    </form>
+    </div><!-- /.col-md-8 -->
+  </div><!-- /.row (form) -->
+
+</div><!-- /.container-fluid -->
+
+<script>
+/* ================================================================
+   Multi-step navigation
+   ================================================================ */
+let currentStep = 1;
+const TOTAL_STEPS = 4;
+
+function updateUI(step) {
+  // Cards
+  for (let i = 1; i <= TOTAL_STEPS; i++) {
+    document.getElementById('step-' + i).classList.toggle('active', i === step);
+  }
+  // Sidebar steps
+  document.querySelectorAll('.vf-step').forEach(el => {
+    const s = parseInt(el.dataset.step);
+    el.classList.remove('active', 'done');
+    if (s === step) el.classList.add('active');
+    else if (s < step) el.classList.add('done');
+  });
+  // Progress bar
+  const pct = Math.round((step / TOTAL_STEPS) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent  = pct + '%';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goToStep(step) {
+  if (step <= currentStep) {
+    currentStep = step;
+    updateUI(step);
+  }
+}
+
+function nextStep(from) {
+  if (!validateStep(from)) return;
+  if (from < TOTAL_STEPS) {
+    currentStep = from + 1;
+    if (currentStep === 4) buildReview();
+    updateUI(currentStep);
+  }
+}
+
+function prevStep(from) {
+  if (from > 1) {
+    currentStep = from - 1;
+    updateUI(currentStep);
+  }
+}
+
+/* ================================================================
+   Validation
+   ================================================================ */
+function validateStep(step) {
+  clearErrors(step);
+  let valid = true;
+  if (step === 1) {
+    valid = requireField('serie_title')  && valid;
+    valid = requireField('company_name') && valid;
+    valid = requireSelect('job_type')    && valid;
+  }
+  if (step === 2) {
+    const comps = [...document.querySelectorAll('#competences-list input')].filter(i => i.value.trim());
+    const exps  = [...document.querySelectorAll('#experiences-list input')].filter(i => i.value.trim());
+    if (!comps.length) { showListError('competences-list', 'Au moins une compétence est requise.'); valid = false; }
+    if (!exps.length)  { showListError('experiences-list', 'Au moins une expérience est requise.');  valid = false; }
+    valid = requireField('education') && valid;
+  }
+  if (step === 3) valid = requireField('serie_description') && valid;
+  if (step === 4) {
+    valid = requireSelect('package')      && valid;
+    valid = requireSelect('package_type') && valid;
+  }
+  return valid;
+}
+
+function requireField(id) {
+  const el = document.getElementById(id);
+  if (!el) return true;
+  if (!el.value.trim()) { el.classList.add('error'); return false; }
+  el.classList.remove('error'); return true;
+}
+function requireSelect(id) {
+  const el = document.getElementById(id);
+  if (!el) return true;
+  if (!el.value) { el.classList.add('error'); return false; }
+  el.classList.remove('error'); return true;
+}
+function showListError(listId, msg) {
+  const list = document.getElementById(listId);
+  let err = list.parentNode.querySelector('.list-err');
+  if (!err) {
+    err = document.createElement('p');
+    err.className = 'list-err';
+    err.style.cssText = 'color:#ef4444;font-size:12px;margin-top:6px;';
+    list.parentNode.insertBefore(err, list.nextElementSibling);
+  }
+  err.textContent = msg;
+}
+function clearErrors(step) {
+  const card = document.getElementById('step-' + step);
+  card.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+  card.querySelectorAll('.list-err').forEach(el => el.remove());
+}
+
+/* ================================================================
+   Dynamic lists
+   ================================================================ */
+const LIMITS = { 'competences-list': 7, 'experiences-list': 4 };
+
+function addItem(listId, name, label) {
+  const list  = document.getElementById(listId);
+  const items = list.querySelectorAll('.dynamic-item');
+  const limit = LIMITS[listId] || 10;
+  if (items.length >= limit) { alert('Maximum ' + limit + ' entrées autorisées.'); return; }
+  const idx  = items.length + 1;
+  const item = document.createElement('div');
+  item.className = 'dynamic-item';
+  item.draggable = true;
+  item.innerHTML = `
+    <span class="drag-handle"><i class="fa fa-grip-vertical"></i></span>
+    <span class="item-num">${idx}</span>
+    <input type="text" name="${name}" placeholder="${label} ${idx}" maxlength="250">
+    <button type="button" class="btn-remove-item" onclick="removeItem(this,'${listId}')" title="Supprimer">
+      <i class="fa fa-times"></i>
+    </button>`;
+  list.appendChild(item);
+  item.querySelector('input').focus();
+  bindDrag(item);
+  renumberList(listId);
+}
+
+function removeItem(btn, listId) {
+  const list = document.getElementById(listId);
+  if (list.querySelectorAll('.dynamic-item').length <= 1) {
+    alert('Au moins une entrée est requise.'); return;
+  }
+  btn.closest('.dynamic-item').remove();
+  renumberList(listId);
+}
+
+function renumberList(listId) {
+  document.getElementById(listId).querySelectorAll('.item-num')
+    .forEach((el, i) => { el.textContent = i + 1; });
+}
+
+/* ================================================================
+   Drag & drop
+   ================================================================ */
+let dragSrc = null;
+function bindDrag(el) {
+  el.addEventListener('dragstart', function(e) {
+    dragSrc = this; e.dataTransfer.effectAllowed = 'move'; this.style.opacity = '.4';
+  });
+  el.addEventListener('dragend', function() { this.style.opacity = ''; ['competences-list','experiences-list'].forEach(renumberList); });
+  el.addEventListener('dragover', function(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; return false; });
+  el.addEventListener('drop', function(e) {
+    e.stopPropagation(); e.preventDefault();
+    if (dragSrc !== this) {
+      const parent = this.parentNode;
+      const srcIdx = [...parent.children].indexOf(dragSrc);
+      const dstIdx = [...parent.children].indexOf(this);
+      parent.insertBefore(dragSrc, srcIdx < dstIdx ? this.nextSibling : this);
+    }
+    return false;
+  });
+}
+document.querySelectorAll('.dynamic-item').forEach(bindDrag);
+
+/* ================================================================
+   Image preview
+   ================================================================ */
+document.getElementById('featuredImage').addEventListener('change', function() {
+  const file = this.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('preview-img').src = e.target.result;
+    document.getElementById('upload-preview').style.display = 'flex';
+  };
+  reader.readAsDataURL(file);
+});
+const zone = document.getElementById('upload-zone');
+zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('dragover'); });
+zone.addEventListener('dragleave', ()  => zone.classList.remove('dragover'));
+zone.addEventListener('drop', e => {
+  e.preventDefault(); zone.classList.remove('dragover');
+  document.getElementById('featuredImage').files = e.dataTransfer.files;
+  document.getElementById('featuredImage').dispatchEvent(new Event('change'));
+});
+
+/* ================================================================
+   Char counters
+   ================================================================ */
+function bindCounter(taId, ccId, max) {
+  const ta = document.getElementById(taId), cc = document.getElementById(ccId);
+  if (!ta || !cc) return;
+  const update = () => {
+    const len = ta.value.length;
+    cc.textContent = max ? `${len} / ${max}` : `${len} / ∞`;
+    cc.className = 'char-counter';
+    if (max && len > max * .85) cc.classList.add('warn');
+    if (max && len >= max)       cc.classList.add('over');
+  };
+  ta.addEventListener('input', update); update();
+}
+bindCounter('serie_description',   'cc-short', 300);
+bindCounter('dtserie_description', 'cc-long',  0);
+
+/* ================================================================
+   Review builder
+   ================================================================ */
+function buildReview() {
+  const g   = id => document.getElementById(id);
+  const val = id => g(id) ? g(id).value.trim() : '';
+  const opt = id => { const s = g(id); return s && s.selectedIndex > 0 ? s.options[s.selectedIndex].text : '—'; };
+
+  g('rv-title').textContent   = val('serie_title')  || '—';
+  g('rv-company').textContent = val('company_name') || '—';
+  g('rv-jobtype').textContent = opt('job_type');
+  g('rv-lang').textContent    = opt('language');
+
+  const ct = g('rv-comps'); ct.innerHTML = '';
+  document.querySelectorAll('#competences-list input').forEach(i => {
+    if (i.value.trim()) { const t = document.createElement('span'); t.className = 'review-tag'; t.textContent = i.value.trim(); ct.appendChild(t); }
+  });
+  if (!ct.children.length) ct.innerHTML = '<em style="font-size:12px;color:#aaa">Aucune saisie</em>';
+
+  const et = g('rv-exps'); et.innerHTML = '';
+  document.querySelectorAll('#experiences-list input').forEach(i => {
+    if (i.value.trim()) { const t = document.createElement('span'); t.className = 'review-tag exp'; t.textContent = i.value.trim(); et.appendChild(t); }
+  });
+  if (!et.children.length) et.innerHTML = '<em style="font-size:12px;color:#aaa">Aucune saisie</em>';
+}
+
+/* ================================================================
+   Submit
+   ================================================================ */
+document.getElementById('vacancy-form').addEventListener('submit', function(e) {
+  if (!validateStep(4)) { e.preventDefault(); return; }
+  const btn = document.getElementById('submit-btn');
+  btn.classList.add('loading');
+  btn.setAttribute('disabled', 'disabled');
+});
+</script>

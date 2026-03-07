@@ -95,6 +95,58 @@ if(@$url_struc['tree']!=""){
                             break;
                         }
                     break;
+                    // EMPLOI
+                     case 'emploi':
+                           
+                        switch($url_struc['branch']){
+                            case 'new':
+                                include 'views/emploi/emploi-new'.PL;
+                            break;
+                            case 'edit':
+                                
+                                $serie_ID = Input::get('serie_id','get');
+                                $storiSerieTable = new StoriSerie();
+                                
+                                if($storiSerieTable->find($serie_ID)){
+
+                                    $stori_serie_data = $storiSerieTable->data();
+                            
+                                    include 'views/emploi/emploi-edit'.PL;
+                                }
+                                
+                            break;
+                            case 'list':
+                                include 'views/emploi/emploi-list'.PL;
+                            break;
+                            case 'archive':
+                                include 'views/emploi/emploi-archive'.PL;
+                            break;
+                            case 'candidatures':
+                                include 'views/emploi/list-application'.PL;
+                            break;
+                            case 'statistics':
+                                
+                                $serie_ID = Input::get('serie_id','get');
+                                $storiSerieTable = new StoriSerie();
+                                
+                                if($storiSerieTable->find($serie_ID)){
+
+                                    $stori_serie_data = $storiSerieTable->data();
+                            
+                                    include 'views/serie/serie-statistics'.PL;
+                                }
+                                
+                            break;
+                            default:
+                                include 'views/emploi/emploi-list'.PL;
+                            break;
+                        }
+                    break;
+
+
+
+
+
                     case 'serie':
                            
                         switch($url_struc['branch']){

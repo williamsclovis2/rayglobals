@@ -1,0 +1,50 @@
+2026-03-07 01:15:18 SUBMIT
+Array
+(
+    [absDir] => C:/xampp/htdocs/rayglobals/admin/media_data/stori/applications/3/
+    [absDir_exists] => YES
+    [path_cv] => admin/media_data/stori/applications/3/clovis_m_cv_aa60.pdf
+    [path_cover] => admin/media_data/stori/applications/3/clovis_m_lettre_2abc.pdf
+    [diploma_count] => 1
+    [diploma_paths] => Array
+        (
+            [0] => admin/media_data/stori/applications/3/clovis_m_diplome1_8091.pdf
+        )
+
+    [FILES_dip_errors] => Array
+        (
+            [0] => 0
+        )
+
+    [FILES_dip_names] => Array
+        (
+            [0] => D2359168S numero impot.pdf
+        )
+
+)
+
+2026-03-07 01:25:39 SUBMIT
+Array
+(
+    [absDir] => C:/xampp/htdocs/rayglobals/admin/media_data/stori/applications/3/
+    [absDir_exists] => YES
+    [path_cv] => media_data/stori/applications/3/kambale_malumalu_kasimba_cv_d251.pdf
+    [path_cover] => media_data/stori/applications/3/kambale_malumalu_kasimba_lettre_ba59.pdf
+    [diploma_count] => 1
+    [diploma_paths] => Array
+        (
+            [0] => media_data/stori/applications/3/kambale_malumalu_kasimba_diplome1_1dd4.pdf
+        )
+
+    [FILES_dip_errors] => Array
+        (
+            [0] => 0
+        )
+
+    [FILES_dip_names] => Array
+        (
+            [0] => RIBA STORAGE QUOTATION.pdf
+        )
+
+)
+

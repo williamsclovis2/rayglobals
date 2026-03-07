@@ -83,6 +83,13 @@ RewriteCond %{REQUEST_FILENAME} !-d
  RewriteRule ^app/serie/([a-z]+)(/*)$ index.php?request=app&trunk=serie&branch=$1
  RewriteRule ^app/serie/([a-z]+)/([0-9]+)(/*)$ index.php?request=app&trunk=serie&serie_id=$2&branch=$1
 
+
+ #-----------------------------------------------#
+# Set Emploi page
+#-----------------------------------------------#
+
+ RewriteRule ^app/emploi/([a-z]+)(/*)$ index.php?request=app&trunk=emploi&branch=$1
+ RewriteRule ^app/emploi/([a-z]+)/([0-9]+)(/*)$ index.php?request=app&trunk=emploi&serie_id=$2&branch=$1
  
 #-----------------------------------------------#
 # Set Episode page

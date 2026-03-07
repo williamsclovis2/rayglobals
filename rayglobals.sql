@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 25, 2026 at 09:23 AM
+-- Generation Time: Mar 07, 2026 at 07:41 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.1.25
 
@@ -103,12 +103,8 @@ CREATE TABLE `app_users` (
 --
 
 INSERT INTO `app_users` (`ID`, `company_ID`, `admin_ID`, `username`, `firstname`, `lastname`, `password`, `salt`, `email`, `phone`, `country_ID`, `gender`, `last_access`, `last_login`, `account_session`, `profile`, `temp`, `groups`, `date_insert`, `recovery_string`, `state`) VALUES
-(15, '6', '14', 'barclay', 'Barclay', 'Bk', '75cbe963fdf6d2460bec465b9f31f5cc704f0dbef149bf2255812c570ba8bfd0', '81W8ZzZagpAWMOeCAyFWjefq2s4DaJ1u', 'barclaynails@gmail.com', '+256 752 111975', NULL, NULL, '1771277703', NULL, '0', NULL, '1771105508', 'Admin', '14-02-2026 23:45:08', NULL, 'Activated'),
-(14, '6', '8', 'kambale', 'Kambale', 'Mulwahali', 'cc443254103ae57fd98a0eb9c1707d5130ec29cdd5ee7f657bde142c6c7a5c62', 't323nKO08CptpNav5PEJfSKC7roog86f', 'clovismul@gmail.com', '0784701793', NULL, NULL, '1771198646', NULL, '0', NULL, '1771104283', 'Admin', '14-02-2026 23:24:43', NULL, 'Activated'),
-(16, '6', '14', 'reception', 'Emily', 'Reception', 'ed11811e65ee6bf3e12b0518f8a8f2752fedac6147e2713103a3f7b13edfc4f6', 'Jj326L3VTYv1BdosmZdPuEu73r4ylzBl', 'emily@gmail.com', '0759472269', NULL, NULL, '1771355133', NULL, '0', NULL, '1771107887', 'Admin', '15-02-2026 00:24:47', NULL, 'Activated'),
-(17, '6', '15', 'chris', 'Chris', 'Decline', 'b52c59384085046c0e752804437c063866c679bc6b2e2db0af884b5e1075b079', 'lHslILpQm5ADsnSfSbNDfUMzIhQiHtWQ', 'declinechris@gmail.com', '0773577286', NULL, NULL, NULL, NULL, '0', NULL, '1771145320', 'Worker', '15-02-2026 10:48:40', NULL, 'Activated'),
-(18, '6', '15', 'damso', 'Damso', 'Dams', '3935c1a8df1412fdccfff3818001b49b4a33627146477a2c66f9a78256c90602', 'NaNhkDccoykzbmhKR64mwkgKAepIH7Vz', 'damsodams@gmail.com', '0762365658', NULL, NULL, NULL, NULL, '0', NULL, '1771149106', 'Worker', '15-02-2026 11:51:46', NULL, 'Activated'),
-(19, '6', '15', 'erick', 'Erick', 'Byamungu', '416a352ce56d11358f7cb0f9f2d6d832d161cea074ac081b405b22bfc002e877', '2pBLJmSg1fx3a6xzaUUiYejkeBXtrmu1', 'erick@gmail.com', '0746983174', NULL, NULL, NULL, NULL, '0', NULL, '1771149221', 'Worker', '15-02-2026 11:53:41', NULL, 'Activated');
+(14, '6', '8', 'kambale', 'Kambale', 'Mulwahali', 'cc443254103ae57fd98a0eb9c1707d5130ec29cdd5ee7f657bde142c6c7a5c62', 't323nKO08CptpNav5PEJfSKC7roog86f', 'clovismul@gmail.com', '0784701793', NULL, NULL, '1772903156', NULL, '0', NULL, '1771104283', 'Admin', '14-02-2026 23:24:43', NULL, 'Activated'),
+(21, '6', '14', 'raymond', 'Raymond', 'Mulala', '2e67a663f75138c58783ac2391bc6b0241b824cdca0640def1e18dcde9b31492', 'WRpsre4wNTmYkUmcPwhAPw4uTPA28mPA', 'jmulala@rayglobals.org', '+250784701793', NULL, NULL, NULL, NULL, '0', NULL, '1772905021', 'Admin', '07-03-2026 19:37:01', NULL, 'Activated');
 
 -- --------------------------------------------------------
 
@@ -1329,6 +1325,44 @@ CREATE TABLE `expenses` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `job_applications`
+--
+
+CREATE TABLE `job_applications` (
+  `ID` int(11) NOT NULL,
+  `job_id` int(11) NOT NULL DEFAULT 0,
+  `job_title` varchar(255) NOT NULL DEFAULT '',
+  `company_name` varchar(255) NOT NULL DEFAULT '',
+  `job_type` varchar(100) NOT NULL DEFAULT '',
+  `job_location` varchar(255) NOT NULL DEFAULT '',
+  `job_category` varchar(100) NOT NULL DEFAULT '',
+  `firstname` varchar(80) NOT NULL DEFAULT '',
+  `lastname` varchar(80) NOT NULL DEFAULT '',
+  `gender` varchar(50) NOT NULL DEFAULT '',
+  `dob` date DEFAULT NULL,
+  `email` varchar(150) NOT NULL DEFAULT '',
+  `phone` varchar(50) NOT NULL DEFAULT '',
+  `country` varchar(100) NOT NULL DEFAULT '',
+  `city` varchar(100) NOT NULL DEFAULT '',
+  `education` varchar(150) NOT NULL DEFAULT '',
+  `experience` varchar(100) NOT NULL DEFAULT '',
+  `current_position` varchar(150) DEFAULT '',
+  `linkedin` varchar(255) DEFAULT '',
+  `file_cv` varchar(255) DEFAULT '',
+  `file_cover` varchar(255) DEFAULT '',
+  `file_diplomas` text DEFAULT NULL,
+  `message` text DEFAULT NULL,
+  `status` enum('pending','reviewing','accepted','rejected') NOT NULL DEFAULT 'pending',
+  `ip_address` varchar(45) DEFAULT '',
+  `created_date` date DEFAULT NULL,
+  `created_time` time DEFAULT NULL,
+  `updated_date` date DEFAULT NULL,
+  `updated_time` time DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `liquidations`
 --
 
@@ -1632,6 +1666,9 @@ CREATE TABLE `stori_serie` (
   `posting_time` time DEFAULT NULL,
   `updated_date` varchar(50) DEFAULT NULL,
   `language` varchar(100) DEFAULT 'KINYARWANDA',
+  `category` varchar(100) DEFAULT NULL COMMENT 'Job category (informatique, finance, …)',
+  `location` varchar(150) DEFAULT NULL COMMENT 'Physical job location / city',
+  `experience_range` varchar(20) DEFAULT NULL COMMENT 'Required experience range: 1-2 | 2-3 | 3-6 | 6+',
   `state` varchar(50) DEFAULT 'Pending',
   `pin_top` int(8) NOT NULL DEFAULT 0,
   `views` int(11) NOT NULL DEFAULT 0,
@@ -1800,6 +1837,16 @@ ALTER TABLE `expenses`
   ADD KEY `idx_liquidation_id` (`liquidation_id`);
 
 --
+-- Indexes for table `job_applications`
+--
+ALTER TABLE `job_applications`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `idx_job_id` (`job_id`),
+  ADD KEY `idx_email` (`email`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_created` (`created_date`);
+
+--
 -- Indexes for table `liquidations`
 --
 ALTER TABLE `liquidations`
@@ -1834,7 +1881,12 @@ ALTER TABLE `stori_package`
 -- Indexes for table `stori_serie`
 --
 ALTER TABLE `stori_serie`
-  ADD PRIMARY KEY (`ID`);
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `idx_stori_category` (`category`),
+  ADD KEY `idx_stori_location` (`location`),
+  ADD KEY `idx_stori_experience_range` (`experience_range`),
+  ADD KEY `idx_stori_job_type` (`job_type`),
+  ADD KEY `idx_stori_posting_date` (`posting_date`);
 
 --
 -- Indexes for table `stori_slide`
@@ -1868,7 +1920,7 @@ ALTER TABLE `app_company`
 -- AUTO_INCREMENT for table `app_users`
 --
 ALTER TABLE `app_users`
-  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `ID` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `app_user_session`
@@ -1917,6 +1969,12 @@ ALTER TABLE `events`
 --
 ALTER TABLE `expenses`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `job_applications`
+--
+ALTER TABLE `job_applications`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `liquidations`

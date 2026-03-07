@@ -1,5 +1,8 @@
 <?php
 
+require_once dirname(__FILE__) . '/../classes/PHPMailer.php';
+require_once dirname(__FILE__) . '/../classes/class.smtp.php';
+
 function RT() {
     return RT;
 }
@@ -39,8 +42,6 @@ function data_out($data) {
 
 function data_in($data) {
     $data = iconv("UTF-8", "ISO-8859-1//TRANSLIT", $data);
-    //$data = str_replace('"', "'", $data);
-    //$data = addslashes($data);
     $data = htmlentities($data, ENT_QUOTES, 'UTF-8');
     return $data;
 }
@@ -107,10 +108,10 @@ function sanAsID($data) {
 }
 
 function valid_pass($candidate) {
-    $r1 = "/[A-Z]/";  //Uppercase
-    $r2 = "/[a-z]/";  //lowercase
-    $r3 = "/[!@#$%^&*()\-_=+{};:,<.>]/";  // whatever you mean by 'special char'
-    $r4 = "/[0-9]/";  //numbers
+    $r1 = "/[A-Z]/";
+    $r2 = "/[a-z]/";
+    $r3 = "/[!@#$%^&*()\-_=+{};:,<.>]/";
+    $r4 = "/[0-9]/";
     $error = false;
     $error_msg = "Your password misses";
     if (!preg_match($r1, $candidate)) {
@@ -161,13 +162,9 @@ function htmlEnt($data) {
     return htmlentities($data);
 }
 
-// dot split
-
 function dot_split($data) {
     return @end(explode(".", $data));
 }
-
-// tack extension
 
 function get_exten($file_name) {
     return @strtolower(end(explode(".", $file_name)));
@@ -193,7 +190,6 @@ function artag($string) {
     $i = 0;
     while ($i < $arrc) {
         if (substr($arr[$i], 0, 1) == $artag) {
-
             $tag = substr($arr[$i], 1, strlen($arr[$i]));
             if (!empty($tag) && !is_numeric($tag)) {
                 $userClass = new User();
@@ -214,8 +210,6 @@ function artag($string) {
 function removeChars($str) {
     return preg_replace("#[^0-9a-z]#i", "", $str);
 }
-
-// errors print
 
 function output_errors($errors) {
     return "<ul><li>" . implode("</li><li>", $errors) . "</li></ul>";
@@ -335,78 +329,36 @@ function dates($str, $sec = 0) {
     return $this_date->format($str);
 }
 
-// BK Code
-// End Processing
-//  ----------------------------------------------------------------------------
-// This function uses the QSI Response code retrieved from the Digital
-// Receipt and returns an appropriate description for the QSI Response Code
-//
-// @param $responseCode String containing the QSI Response Code
-//
-// @return String containing the appropriate description
-//
-
 function getResponseDescription($responseCode) {
-
     switch ($responseCode) {
-        case "0" : $result = "Transaction Successful";
-            break;
-        case "?" : $result = "Transaction status is unknown";
-            break;
-        case "1" : $result = "Unknown Error";
-            break;
-        case "2" : $result = "Bank Declined Transaction";
-            break;
-        case "3" : $result = "No Reply from Bank";
-            break;
-        case "4" : $result = "Expired Card";
-            break;
-        case "5" : $result = "Insufficient funds";
-            break;
-        case "6" : $result = "Error Communicating with Bank";
-            break;
-        case "7" : $result = "Payment Server System Error";
-            break;
-        case "8" : $result = "Transaction Type Not Supported";
-            break;
-        case "9" : $result = "Bank declined transaction (Do not contact Bank)";
-            break;
-        case "A" : $result = "Transaction Aborted";
-            break;
-        case "C" : $result = "Transaction Cancelled";
-            break;
-        case "D" : $result = "Deferred transaction has been received and is awaiting processing";
-            break;
-        case "F" : $result = "3D Secure Authentication failed";
-            break;
-        case "I" : $result = "Card Security Code verification failed";
-            break;
-        case "L" : $result = "Shopping Transaction Locked (Please try the transaction again later)";
-            break;
-        case "N" : $result = "Cardholder is not enrolled in Authentication scheme";
-            break;
-        case "P" : $result = "Transaction has been received by the Payment Adaptor and is being processed";
-            break;
-        case "R" : $result = "Transaction was not processed - Reached limit of retry attempts allowed";
-            break;
-        case "S" : $result = "Duplicate SessionID (OrderInfo)";
-            break;
-        case "T" : $result = "Address Verification Failed";
-            break;
-        case "U" : $result = "Card Security Code Failed";
-            break;
-        case "V" : $result = "Address Verification and Card Security Code Failed";
-            break;
-        default : $result = "Unable to be determined";
+        case "0" : $result = "Transaction Successful"; break;
+        case "?" : $result = "Transaction status is unknown"; break;
+        case "1" : $result = "Unknown Error"; break;
+        case "2" : $result = "Bank Declined Transaction"; break;
+        case "3" : $result = "No Reply from Bank"; break;
+        case "4" : $result = "Expired Card"; break;
+        case "5" : $result = "Insufficient funds"; break;
+        case "6" : $result = "Error Communicating with Bank"; break;
+        case "7" : $result = "Payment Server System Error"; break;
+        case "8" : $result = "Transaction Type Not Supported"; break;
+        case "9" : $result = "Bank declined transaction (Do not contact Bank)"; break;
+        case "A" : $result = "Transaction Aborted"; break;
+        case "C" : $result = "Transaction Cancelled"; break;
+        case "D" : $result = "Deferred transaction has been received and is awaiting processing"; break;
+        case "F" : $result = "3D Secure Authentication failed"; break;
+        case "I" : $result = "Card Security Code verification failed"; break;
+        case "L" : $result = "Shopping Transaction Locked (Please try the transaction again later)"; break;
+        case "N" : $result = "Cardholder is not enrolled in Authentication scheme"; break;
+        case "P" : $result = "Transaction has been received by the Payment Adaptor and is being processed"; break;
+        case "R" : $result = "Transaction was not processed - Reached limit of retry attempts allowed"; break;
+        case "S" : $result = "Duplicate SessionID (OrderInfo)"; break;
+        case "T" : $result = "Address Verification Failed"; break;
+        case "U" : $result = "Card Security Code Failed"; break;
+        case "V" : $result = "Address Verification and Card Security Code Failed"; break;
+        default  : $result = "Unable to be determined";
     }
     return $result;
 }
-
-//  -----------------------------------------------------------------------------
-// This subroutine takes a data String and returns a predefined value if empty
-// If data Sting is null, returns string "No Value Returned", else returns input
-// @param $in String containing the data String
-// @return String containing the output String
 
 function null2unknown($map, $key) {
     if (array_key_exists($key, $map)) {
@@ -416,6 +368,3 @@ function null2unknown($map, $key) {
     }
     return "No Value Returned";
 }
-
-//  ----------------------------------------------------------------------------
-?>

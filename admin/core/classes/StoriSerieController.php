@@ -1,413 +1,428 @@
 <?php
 
-class StoriSerieController {
+/**
+ * StoriSerieController.php
+ *
+ * Handles add / edit / state changes / view tracking / pin-on-top
+ * for job vacancy listings (stori_serie table).
+ *
+ * New fields vs. original:
+ *  - category        : job category for sidebar filter
+ *  - location        : physical city/region for sidebar filter
+ *  - experience_range: e.g. "1-2", "2-3", "3-6", "6+" for sidebar filter
+ */
+class StoriSerieController
+{
+    /* ------------------------------------------------------------------ */
+    /*  Constants                                                          */
+    /* ------------------------------------------------------------------ */
 
-    public static function edit($stori_serie_data) {
-        $diagnoArray[0] = 'NO_ERRORS';
-        $validate = new \Validate();
-        $error_msg = '';
+    const MAX_COMPETENCES = 7;
+    const MAX_EXPERIENCES = 4;
 
-        $serie_ID = $stori_serie_data->ID;
+    const ALLOWED_IMAGE_TYPES = [
+        'image/jpeg', 'image/pjpeg', 'image/jpg',
+        'image/png', 'image/gif',
+    ];
 
-        $prfx = 'register-';
-        foreach ($_POST as $index => $val) {
-            $ar = explode($prfx, $index);
-            if (count($ar)) {
-                $_SUBMIT[end($ar)] = $val;
-            }
+    const UPLOAD_DIR = 'media_data/stori/';
+
+    /** Valid job categories — must match form options */
+    const VALID_CATEGORIES = [
+        'informatique', 'finance', 'marketing', 'sante',
+        'education', 'construction', 'agriculture', 'autre',
+    ];
+
+    /** Valid experience ranges — must match form options */
+    const VALID_EXPERIENCE_RANGES = ['1-2', '2-3', '3-6', '6+', ''];
+
+    /* ------------------------------------------------------------------ */
+    /*  Public: Add a new vacancy                                          */
+    /* ------------------------------------------------------------------ */
+
+    public static function add(): object
+    {
+        $data = self::parsePrefixedPost('register-');
+
+        $validate   = new Validate();
+        $validation = $validate->check($data, self::buildValidationRules(false));
+
+        if (!$validation->passed()) {
+            return self::errorResponse($validate->getErrorLocation());
         }
 
-        $str = new \Str();
+        $competences = self::extractDynamicList($data, 'competences', self::MAX_COMPETENCES);
+        $experiences = self::extractDynamicList($data, 'experiences',  self::MAX_EXPERIENCES);
 
-        $validate = new Validate();
-        $validation = $validate->check($_SUBMIT, array(
-            'serie_title' => array(
-                'name' => 'Title',
-                'required' => true
-            ),
-            'serie_description' => array(
-                'name' => 'Description',
-                'required' => true
-            ),
-            'package' => array(
-                'name' => 'Package',
-                'required' => true
-            ),
-            'package_type' => array(
-                'name' => 'Package type',
-                'required' => true
-            ),
-            'language' => array(
-                'name' => 'Language'
-            )
-        ));
-
-        if ($validation->passed()) {
-            $categoryClass = new StoriSerie();
-
-            $serie_title = @$_SUBMIT['serie_title'];
-            $serie_description = @$_SUBMIT['serie_description'];
-            $package_type = @$_SUBMIT['package_type'];
-            $package = @$_SUBMIT['package'];
-            $language = @$_SUBMIT['language'];
-
-            $temp = Config::get('time/temp');
-
-            $featured_photo = '';
-
-            if (isset($_FILES['featuredImage']['name']) && !empty($_FILES['featuredImage']['name'])) {
-
-                $_FILES['featuredImage']['type'] = strtolower($_FILES['featuredImage']['type']);
-                $dir = 'media_data/stori/';
-
-                if ($_FILES['featuredImage']['type'] == 'image/png' || $_FILES['featuredImage']['type'] == 'image/jpg' || $_FILES['featuredImage']['type'] == 'image/gif' || $_FILES['featuredImage']['type'] == 'image/jpeg' || $_FILES['featuredImage']['type'] == 'image/pjpeg') {
-                    // setting file's mysterious name
-                    $filename = 'serie_' . substr(md5(date('YmdHis')), -5, 5) . '.jpg';
-                    $file = $dir . 'thumb_' . $filename;
-
-                    $featured_photo = FileManager::upload($_FILES["featuredImage"], $filename, "media_data/stori");
-                } else {
-                    $form_error = true;
-                    Session::put('errors', "Featured photo File not supported");
-                }
-            } else {
-                $featured_photo = $stori_serie_data->photo;
-            }
-
-            $seconds = \Config::get('time/seconds');
-
-            if ($diagnoArray[0] == 'NO_ERRORS') {
-
-                try {
-                    $categoryClass->update(array(
-                        'photo' => $featured_photo,
-                        'serie_title' => $serie_title,
-                        'serie_description' => $serie_description,
-                        'package_type' => $package_type,
-                        'package' => $package,
-                        'language' => $language
-                            ), $serie_ID);
-
-                    Session::put('success', 'The series has been edited successfully!');
-                } catch (Exception $e) {
-                    $diagnoArray[0] = "ERRORS_FOUND";
-                    $diagnoArray[] = $e->getMessage();
-                }
-            }
-        } else {
-            return (object) [
-                        'ERRORS' => true,
-                        'ERRORS_SCRIPT' => $validate->getErrorLocation()
-            ];
+        if (empty($competences)) {
+            return self::errorResponse(['competences' => ['Au moins une compétence est requise.']]);
+        }
+        if (empty($experiences)) {
+            return self::errorResponse(['experiences' => ['Au moins une expérience est requise.']]);
         }
 
-        if ($diagnoArray[0] == 'ERRORS_FOUND') {
-            return (object) [
-                        'ERRORS' => true,
-                        'ERRORS_SCRIPT' => $validate->getErrorLocation()
-            ];
-        } else {
-            return (object) [
-                        'ERRORS' => false,
-                        'SUCCESS' => true,
-                        'ERRORS_SCRIPT' => ""
-            ];
+        $uploadResult = self::handleUpload(true);
+        if ($uploadResult['error']) {
+            Session::put('errors', $uploadResult['message']);
+            return self::errorResponse(['featuredImage' => [$uploadResult['message']]]);
         }
-    }
-
-    public static function add($form = 'Admin') {
-        $diagnoArray[0] = 'NO_ERRORS';
-        $validate = new \Validate();
-        $error_msg = '';
-
-        $prfx = 'register-';
-        foreach ($_POST as $index => $val) {
-            $ar = explode($prfx, $index);
-            if (count($ar)) {
-                $_SUBMIT[end($ar)] = $val;
-            }
-        }
-
-        $str = new \Str();
-
-        $validate = new Validate();
-        $validation = $validate->check($_SUBMIT, array(
-            'serie_title' => array(
-                'name' => 'Title',
-                'required' => true
-            ),
-            'company_name' => array(
-                'name' => "Nom de l'entreprise",
-                'required' => true
-            ),
-            'job_type' => array(
-                'name' => "Type d'emploi",
-                'required' => true
-            ),
-             'comp_1' => array(
-                'name' => 'Compétences 1',
-                'required' => true
-            ),
-            'comp_2' => array(
-                'name' => 'Compétences 2',
-                'required' => true
-            ),
-            'comp_3' => array(
-                'name' => 'Compétences 3',
-                'required' => true
-            ),
-            'comp_4' => array(
-                'name' => 'Compétences 4',
-                'required' => true
-            ),
-            'comp_5' => array(
-                'name' => 'Compétences 5',
-                'required' => true
-            ),
-            'comp_6' => array(
-                'name' => 'Compétences 6',
-                'required' => true
-            ),
-            'comp_7' => array(
-                'name' => 'Compétences 7',
-                'required' => true
-            ),
-            'education' => array(
-                'name' => 'Éducation',
-                'required' => true
-            ),
-               'exp_1' => array(
-                'name' => 'Expérience 1',
-                'required' => true
-            ),
-            'exp_2' => array(
-                'name' => 'Expérience 2',
-                'required' => true
-            ),
-            'exp_3' => array(
-                'name' => 'Expérience 3',
-                'required' => true
-            ),
-            'exp_4' => array(
-                'name' => 'Expérience 4',
-                'required' => true
-            ),
-            'serie_description' => array(
-                'name' => 'Description',
-                'required' => true
-            ),
-            'dtserie_description' => array(
-                'name' => 'Description détaillée'
-            ),
-            'package' => array(
-                'name' => 'Package',
-                'required' => true
-            ),
-            'package_type' => array(
-                'name' => 'Package type',
-                'required' => true
-            ),
-            'language' => array(
-                'name' => 'Language'
-            )
-        ));
-
-        if ($validation->passed()) {
-            $categoryClass = new StoriSerie();
-
-            $serie_title = @$_SUBMIT['serie_title'];
-            $company_name        = @$_SUBMIT['company_name'];
-            $job_type            = @$_SUBMIT['job_type'];
-            $comp_1              = @$_SUBMIT['comp_1'];
-            $comp_2              = @$_SUBMIT['comp_2'];
-            $comp_3              = @$_SUBMIT['comp_3'];
-            $comp_4              = @$_SUBMIT['comp_4'];
-            $comp_5              = @$_SUBMIT['comp_5'];
-            $comp_6              = @$_SUBMIT['comp_6'];
-            $comp_7              = @$_SUBMIT['comp_7'];
-            $education           = @$_SUBMIT['education'];
-            $exp_1               = @$_SUBMIT['exp_1'];
-            $exp_2               = @$_SUBMIT['exp_2'];
-            $exp_3               = @$_SUBMIT['exp_3'];
-            $exp_4               = @$_SUBMIT['exp_4'];
-            $serie_description = @$_SUBMIT['serie_description'];
-            $dtserie_description = @$_SUBMIT['dtserie_description'];
-            $package_type = @$_SUBMIT['package_type'];
-            $package = @$_SUBMIT['package'];
-            $language = @$_SUBMIT['language'];
-
-            $temp = Config::get('time/temp');
-
-            $featured_photo = '';
-
-            if (isset($_FILES['featuredImage']['name']) && !empty($_FILES['featuredImage']['name'])) {
-
-                $_FILES['featuredImage']['type'] = strtolower($_FILES['featuredImage']['type']);
-                $dir = 'media_data/akazuba/';
-
-                if ($_FILES['featuredImage']['type'] == 'image/png' || $_FILES['featuredImage']['type'] == 'image/jpg' || $_FILES['featuredImage']['type'] == 'image/gif' || $_FILES['featuredImage']['type'] == 'image/jpeg' || $_FILES['featuredImage']['type'] == 'image/pjpeg') {
-                    // setting file's mysterious name
-                    $filename = 'serie_' . substr(md5(date('YmdHis')), -5, 5) . '.jpg';
-                    $file = $dir . 'thumb_' . $filename;
-
-                    $featured_photo = FileManager::upload($_FILES["featuredImage"], $filename, "media_data/stori");
-                } else {
-                    $form_error = true;
-                    Session::put('errors', "Featured photo File not supported");
-                }
-            } else {
-                $form_error = true;
-            }
-
-            $seconds = \Config::get('time/seconds');
-
-            if ($diagnoArray[0] == 'NO_ERRORS') {
-
-                $pin_top = (int) self::getLastPin() + 1;
-
-                try {
-                    $categoryClass->insert(array(
-                        'photo' => $featured_photo,
-                        'serie_title' => $serie_title,
-                        'company_name'        => $company_name,
-                        'job_type'            => $job_type,
-                        'comp_1'              => $comp_1,
-                        'comp_2'              => $comp_2,
-                        'comp_3'              => $comp_3,
-                        'comp_4'              => $comp_4,
-                        'comp_5'              => $comp_5,
-                        'comp_6'              => $comp_6,
-                        'comp_7'              => $comp_7,
-                        'education'           => $education,
-                        'exp_1'               => $exp_1,
-                        'exp_2'               => $exp_2,
-                        'exp_3'               => $exp_3,
-                        'exp_4'               => $exp_4,
-                        'serie_description' => $serie_description,
-                        'dtserie_description' => $dtserie_description,
-                        'package_type' => $package_type,
-                        'package' => $package,
-                        'pin_top' => $pin_top,
-                        'language' => $language
-                    ));
-                    Session::put('success', 'The series has been recorded successfully!');
-                } catch (Exception $e) {
-                    $diagnoArray[0] = "ERRORS_FOUND";
-                    $diagnoArray[] = $e->getMessage();
-                }
-            }
-        } else {
-            return (object) [
-                        'ERRORS' => true,
-                        'ERRORS_SCRIPT' => $validate->getErrorLocation()
-            ];
-        }
-
-        if ($diagnoArray[0] == 'ERRORS_FOUND') {
-            return (object) [
-                        'ERRORS' => true,
-                        'ERRORS_SCRIPT' => $validate->getErrorLocation()
-            ];
-        } else {
-            return (object) [
-                        'ERRORS' => false,
-                        'SUCCESS' => true,
-                        'ERRORS_SCRIPT' => ""
-            ];
-        }
-    }
-
-    public static function changeState($state, $serie_ID) {
-        $diagnoArray[0] = 'NO_ERRORS';
-        $validate = new \Validate();
-
-        $ID = $serie_ID;
-
-        $seconds = \Config::get('time/seconds');
-
-        $storiSerieTable = new StoriSerie();
 
         $pin_top = (int) self::getLastPin() + 1;
 
+        $payload = [
+            'photo'               => $uploadResult['path'],
+            'serie_title'         => self::sanitise($data['serie_title']),
+            'company_name'        => self::sanitise($data['company_name']),
+            'job_type'            => self::sanitise($data['job_type']),
+            'category'            => self::sanitiseEnum($data['category']         ?? '', self::VALID_CATEGORIES),
+            'location'            => self::sanitise($data['location']             ?? ''),
+            'experience_range'    => self::sanitiseEnum($data['experience_range'] ?? '', self::VALID_EXPERIENCE_RANGES),
+            'education'           => self::sanitise($data['education']),
+            'serie_description'   => self::sanitise($data['serie_description']),
+            'dtserie_description' => self::sanitise($data['dtserie_description'] ?? ''),
+            'package'             => self::sanitise($data['package']),
+            'package_type'        => self::sanitise($data['package_type']),
+            'language'            => self::sanitise($data['language'] ?? 'KINYARWANDA'),
+            'pin_top'             => $pin_top,
+            'state'               => 'Pending',
+        ];
+
+        for ($i = 1; $i <= self::MAX_COMPETENCES; $i++) {
+            $payload["comp_{$i}"] = $competences[$i - 1] ?? null;
+        }
+        for ($i = 1; $i <= self::MAX_EXPERIENCES; $i++) {
+            $payload["exp_{$i}"] = $experiences[$i - 1] ?? null;
+        }
+
         try {
-            switch ($state) {
-                case 'Published';
-                    $storiSerieTable->update(array(
-                        'state' => 'Published',
-                        'posting_date' => Dates::convTo('date', $seconds),
-                        'posting_time' => Dates::convTo('time', $seconds),
-                        'pin_top' => $pin_top
-                            ), $ID);
-                    break;
-                case 'Pending';
-                    $storiSerieTable->update(array(
-                        'state' => 'Pending'
-                            ), $ID);
-                    break;
-                case 'Deleted';
-                    $storiSerieTable->update(array(
-                        'state' => 'Deleted'
-                            ), $ID);
-                    break;
-            }
+            (new StoriSerie())->insert($payload);
+            Session::put('success', 'L\'offre d\'emploi a été enregistrée avec succès !');
+            return self::successResponse();
         } catch (Exception $e) {
-            $diagnoArray[0] = "ERRORS_FOUND";
-            $diagnoArray[] = $e->getMessage();
-        }
-        if ($diagnoArray[0] == 'ERRORS_FOUND') {
-            return (object) [
-                        'ERRORS' => true,
-                        'ERRORS_SCRIPT' => $diagnoArray
-            ];
-        } else {
-            return (object) [
-                        'ERRORS' => false,
-                        'SUCCESS' => true,
-                        'ERRORS_SCRIPT' => ""
-            ];
+            error_log('[StoriSerieController::add] ' . $e->getMessage());
+            return self::errorResponse(['_db' => [$e->getMessage()]]);
         }
     }
 
-    public static function addView($serie_ID) {
+    /* ------------------------------------------------------------------ */
+    /*  Public: Edit an existing vacancy                                   */
+    /* ------------------------------------------------------------------ */
 
+    public static function edit(object $stori_serie_data): object
+    {
+        $serie_ID = (int) $stori_serie_data->ID;
+
+        $data = self::parsePrefixedPost('register-');
+
+        $validate   = new Validate();
+        $validation = $validate->check($data, self::buildValidationRules(true));
+
+        if (!$validation->passed()) {
+            return self::errorResponse($validate->getErrorLocation());
+        }
+
+        $competences = self::extractDynamicList($data, 'competences', self::MAX_COMPETENCES);
+        $experiences = self::extractDynamicList($data, 'experiences',  self::MAX_EXPERIENCES);
+
+        if (empty($competences)) {
+            return self::errorResponse(['competences' => ['Au moins une compétence est requise.']]);
+        }
+        if (empty($experiences)) {
+            return self::errorResponse(['experiences' => ['Au moins une expérience est requise.']]);
+        }
+
+        $uploadResult = self::handleUpload(false);
+        if ($uploadResult['error']) {
+            Session::put('errors', $uploadResult['message']);
+            return self::errorResponse(['featuredImage' => [$uploadResult['message']]]);
+        }
+
+        $photo = $uploadResult['path'] ?: $stori_serie_data->photo;
+
+        $payload = [
+            'photo'               => $photo,
+            'serie_title'         => self::sanitise($data['serie_title']),
+            'company_name'        => self::sanitise($data['company_name']),
+            'job_type'            => self::sanitise($data['job_type']),
+            'category'            => self::sanitiseEnum($data['category']         ?? '', self::VALID_CATEGORIES),
+            'location'            => self::sanitise($data['location']             ?? ''),
+            'experience_range'    => self::sanitiseEnum($data['experience_range'] ?? '', self::VALID_EXPERIENCE_RANGES),
+            'education'           => self::sanitise($data['education']),
+            'serie_description'   => self::sanitise($data['serie_description']),
+            'dtserie_description' => self::sanitise($data['dtserie_description'] ?? ''),
+            'package'             => self::sanitise($data['package']),
+            'package_type'        => self::sanitise($data['package_type']),
+            'language'            => self::sanitise($data['language'] ?? 'KINYARWANDA'),
+            'updated_date'        => Dates::get('Y-m-d'),
+        ];
+
+        for ($i = 1; $i <= self::MAX_COMPETENCES; $i++) {
+            $payload["comp_{$i}"] = $competences[$i - 1] ?? null;
+        }
+        for ($i = 1; $i <= self::MAX_EXPERIENCES; $i++) {
+            $payload["exp_{$i}"] = $experiences[$i - 1] ?? null;
+        }
+
+        try {
+            (new StoriSerie())->update($payload, $serie_ID);
+            Session::put('success', 'L\'offre d\'emploi a été mise à jour avec succès !');
+            return self::successResponse();
+        } catch (Exception $e) {
+            error_log('[StoriSerieController::edit] ' . $e->getMessage());
+            return self::errorResponse(['_db' => [$e->getMessage()]]);
+        }
+    }
+
+    /* ------------------------------------------------------------------ */
+    /*  Public: Change state                                               */
+    /* ------------------------------------------------------------------ */
+
+    public static function changeState(string $state, int $serie_ID): object
+    {
+        $allowedStates = ['Published', 'Pending', 'Deleted'];
+        if (!in_array($state, $allowedStates, true)) {
+            return self::errorResponse(['state' => ['État non valide.']]);
+        }
+
+        $seconds         = Config::get('time/seconds');
         $storiSerieTable = new StoriSerie();
-        $storiSerieTable->selectQuery("SELECT `views` FROM `stori_serie` WHERE `ID`=?", array($serie_ID));
+        $payload         = [];
 
-        if ($storiSerieTable->count()) {
-            $stori_serie_data = $storiSerieTable->first();
-            $new_view = $stori_serie_data->views + 1;
-            $seconds = \Config::get('time/seconds');
-            try {
+        switch ($state) {
+            case 'Published':
+                $payload = [
+                    'state'        => 'Published',
+                    'posting_date' => Dates::convTo('date', $seconds),
+                    'posting_time' => Dates::convTo('time', $seconds),
+                    'pin_top'      => (int) self::getLastPin() + 1,
+                ];
+                break;
+            case 'Pending':
+                $payload = ['state' => 'Pending'];
+                break;
+            case 'Deleted':
+                $payload = ['state' => 'Deleted'];
+                break;
+        }
 
-                $storiSerieTable->update(array(
-                    'views' => $new_view,
-                    'last_view_date' => Dates::convTo('date', $seconds),
-                    'last_view_time' => Dates::convTo('time', $seconds)
-                        ), $serie_ID);
-            } catch (Exception $e) {
-                
-            }
+        try {
+            $storiSerieTable->update($payload, $serie_ID);
+            return self::successResponse();
+        } catch (Exception $e) {
+            error_log('[StoriSerieController::changeState] ' . $e->getMessage());
+            return self::errorResponse(['_db' => [$e->getMessage()]]);
         }
     }
 
-    public static function pinOnTop($serie_ID) {
+    /* ------------------------------------------------------------------ */
+    /*  Public: Add a view                                                 */
+    /* ------------------------------------------------------------------ */
+
+    public static function addView(int $serie_ID): void
+    {
+        $table = new StoriSerie();
+        $table->selectQuery('SELECT `views` FROM `stori_serie` WHERE `ID` = ?', [$serie_ID]);
+
+        if (!$table->count()) return;
+
+        $new_views = (int) $table->first()->views + 1;
+        $seconds   = Config::get('time/seconds');
+
+        try {
+            $table->update([
+                'views'          => $new_views,
+                'last_view_date' => Dates::convTo('date', $seconds),
+                'last_view_time' => Dates::convTo('time', $seconds),
+            ], $serie_ID);
+        } catch (Exception $e) {
+            error_log('[StoriSerieController::addView] ' . $e->getMessage());
+        }
+    }
+
+    /* ------------------------------------------------------------------ */
+    /*  Public: Pin on top                                                 */
+    /* ------------------------------------------------------------------ */
+
+    public static function pinOnTop(int $serie_ID): void
+    {
         $pin_top = (int) self::getLastPin() + 1;
-
-        $storiSerieTable = new StoriSerie();
         try {
-            $storiSerieTable->update(array(
-                'pin_top' => $pin_top
-                    ), $serie_ID);
+            (new StoriSerie())->update(['pin_top' => $pin_top], $serie_ID);
         } catch (Exception $e) {
-            
+            error_log('[StoriSerieController::pinOnTop] ' . $e->getMessage());
         }
     }
 
-    public static function getLastPin() {
-        $storiSerieTable = new StoriSerie();
-        $storiSerieTable->selectQuery("SELECT `pin_top` FROM `stori_serie` ORDER BY `pin_top` DESC LIMIT 1");
-        $data = $storiSerieTable->first();
-        return $data->pin_top;
+    /* ------------------------------------------------------------------ */
+    /*  Public: Get highest pin_top value                                  */
+    /* ------------------------------------------------------------------ */
+
+    public static function getLastPin(): int
+    {
+        $table = new StoriSerie();
+        $table->selectQuery('SELECT `pin_top` FROM `stori_serie` ORDER BY `pin_top` DESC LIMIT 1');
+
+        if ($table->count() && ($first = $table->first()) && isset($first->pin_top)) {
+            return (int) $first->pin_top;
+        }
+        return 0;
     }
 
+    /* ------------------------------------------------------------------ */
+    /*  Public: Build a filtered query for the vacancies list page        */
+    /* ------------------------------------------------------------------ */
+
+    /**
+     * Returns ['sql' => string, 'params' => array, 'count' => int]
+     * Usage in vacancies.php:
+     *   $result = StoriSerieController::buildFilteredQuery($_GET);
+     *   $storiSerieTable->selectQuery($result['sql'], $result['params']);
+     */
+    public static function buildFilteredQuery(array $get): array
+    {
+        $where  = ["state = 'Published'"];
+        $params = [];
+
+        // Job type filter (checkbox array)
+        if (!empty($get['job_type']) && is_array($get['job_type'])) {
+            $safe  = array_filter($get['job_type'], fn($v) => preg_match('/^[a-z]+$/', $v));
+            if ($safe) {
+                $ph     = implode(',', array_fill(0, count($safe), '?'));
+                $where[]= "job_type IN ($ph)";
+                $params = array_merge($params, array_values($safe));
+            }
+        }
+
+        // Category filter
+        if (!empty($get['category']) && in_array($get['category'], self::VALID_CATEGORIES, true)) {
+            $where[]  = 'category = ?';
+            $params[] = $get['category'];
+        }
+
+        // Location filter
+        if (!empty($get['location'])) {
+            $where[]  = 'location LIKE ?';
+            $params[] = '%' . $get['location'] . '%';
+        }
+
+        // Experience range filter (checkbox array)
+        if (!empty($get['experience_range']) && is_array($get['experience_range'])) {
+            $safe = array_filter($get['experience_range'], fn($v) => in_array($v, self::VALID_EXPERIENCE_RANGES, true));
+            if ($safe) {
+                $ph     = implode(',', array_fill(0, count($safe), '?'));
+                $where[]= "experience_range IN ($ph)";
+                $params = array_merge($params, array_values($safe));
+            }
+        }
+
+        // "Posted within N days" filter
+        if (!empty($get['posted_within']) && ctype_digit((string) $get['posted_within'])) {
+            $days     = (int) $get['posted_within'];
+            $where[]  = 'posting_date >= DATE_SUB(CURDATE(), INTERVAL ? DAY)';
+            $params[] = $days;
+        }
+
+        $sql = 'SELECT * FROM `stori_serie` WHERE '
+             . implode(' AND ', $where)
+             . ' ORDER BY pin_top DESC';
+
+        return ['sql' => $sql, 'params' => $params];
+    }
+
+    /* ------------------------------------------------------------------ */
+    /*  Private helpers                                                    */
+    /* ------------------------------------------------------------------ */
+
+    private static function parsePrefixedPost(string $prefix): array
+    {
+        $result = [];
+        foreach ($_POST as $key => $val) {
+            if (strpos($key, $prefix) === 0) {
+                $cleanKey          = substr($key, strlen($prefix));
+                $result[$cleanKey] = $val;
+            }
+        }
+        return $result;
+    }
+
+    private static function extractDynamicList(array $data, string $key, int $max): array
+    {
+        if (empty($data[$key]) || !is_array($data[$key])) return [];
+
+        $items = [];
+        foreach ($data[$key] as $item) {
+            $clean = trim((string) $item);
+            if ($clean !== '') {
+                $items[] = htmlspecialchars($clean, ENT_QUOTES, 'UTF-8');
+            }
+            if (count($items) >= $max) break;
+        }
+        return $items;
+    }
+
+    private static function handleUpload(bool $required): array
+    {
+        $noFile = empty($_FILES['featuredImage']['name']);
+
+        if ($noFile) {
+            if ($required) {
+                return ['error' => true, 'path' => '', 'message' => 'Le logo de l\'entreprise est obligatoire.'];
+            }
+            return ['error' => false, 'path' => '', 'message' => ''];
+        }
+
+        $mimeType = strtolower($_FILES['featuredImage']['type']);
+        if (!in_array($mimeType, self::ALLOWED_IMAGE_TYPES, true)) {
+            return ['error' => true, 'path' => '', 'message' => 'Format d\'image non supporté. Utilisez PNG, JPG ou GIF.'];
+        }
+
+        $filename = 'serie_' . substr(md5(uniqid('', true)), -8) . '.jpg';
+        $uploaded = FileManager::upload($_FILES['featuredImage'], $filename, self::UPLOAD_DIR);
+
+        if (!$uploaded) {
+            return ['error' => true, 'path' => '', 'message' => 'Erreur lors du téléversement de l\'image.'];
+        }
+
+        return ['error' => false, 'path' => $uploaded, 'message' => ''];
+    }
+
+    private static function buildValidationRules(bool $isEdit): array
+    {
+        return [
+            'serie_title'        => ['name' => 'Titre du poste',      'required' => true,  'max' => 150],
+            'company_name'       => ['name' => "Nom de l'entreprise",  'required' => true,  'max' => 150],
+            'job_type'           => ['name' => "Type d'emploi",        'required' => true],
+            'category'           => ['name' => 'Catégorie',            'required' => true],
+            'location'           => ['name' => 'Localisation',         'required' => true,  'max' => 150],
+            'experience_range'   => ['name' => 'Expérience'],
+            'education'          => ['name' => 'Éducation',            'required' => true,  'max' => 250],
+            'serie_description'  => ['name' => 'Courte description',   'required' => true,  'max' => 300],
+            'dtserie_description'=> ['name' => 'Description détaillée'],
+            'package'            => ['name' => 'Emplacement',          'required' => true],
+            'package_type'       => ['name' => 'Visibilité',           'required' => true],
+            'language'           => ['name' => 'Langue'],
+        ];
+    }
+
+    /** Sanitise a value that must be one of a fixed set; returns '' if not valid */
+    private static function sanitiseEnum(string $value, array $allowed): string
+    {
+        $v = trim($value);
+        return in_array($v, $allowed, true) ? $v : '';
+    }
+
+    private static function sanitise(string $value): string
+    {
+        return trim(htmlspecialchars($value, ENT_QUOTES, 'UTF-8'));
+    }
+
+    private static function errorResponse(array $errorScript = []): object
+    {
+        return (object) ['ERRORS' => true, 'SUCCESS' => false, 'ERRORS_SCRIPT' => $errorScript];
+    }
+
+    private static function successResponse(): object
+    {
+        return (object) ['ERRORS' => false, 'SUCCESS' => true, 'ERRORS_SCRIPT' => []];
+    }
 }

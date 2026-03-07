@@ -29,7 +29,8 @@
 
 <link rel="stylesheet" href="<?=DNADMIN?>/dist/css/skins/skin-if.css">
 <link rel="stylesheet" href="<?=DNADMIN?>/assets/css/app.css">
-
+<link rel="stylesheet" href="<?=DNADMIN?>/assets/css/customer.css">
+<link rel="stylesheet" href="<?=DNADMIN?>/assets/css/vacancy.css">
 <link rel="stylesheet" href="<?=DNADMIN?>/plugins/lightslider/css/lightslider.min.css">
 
   <!-- Morris Charts-->

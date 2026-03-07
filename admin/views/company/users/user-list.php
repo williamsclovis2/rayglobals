@@ -1,252 +1,300 @@
-<style>
-    .popover-content{
-        width: 140px   
+<?php
+
+
+// ── Handle state actions (block / activate) — original logic preserved ──
+if (isset($_POST['request']) && $_POST['request'] === 'user-state') {
+    // Handled by the existing form POST (block / activate buttons)
+    // The original form+popover logic is kept intact below
+}
+
+// ── Count stats ──
+$userStatsTable = new User();
+$userStatsTable->selectQuery(
+    "SELECT state, COUNT(*) as cnt FROM `app_users` WHERE `company_ID`=? AND `state`!='Deleted' GROUP BY state",
+    [$session_company_ID]
+);
+$statsByState = ['Activated' => 0, 'Blocked' => 0, 'Pending' => 0];
+if ($userStatsTable->count()) {
+    foreach ($userStatsTable->data() as $row) {
+        $statsByState[$row->state] = $row->cnt;
     }
-</style>
-<section class="content-header">
-	<div class="page_header">
-		<div class="row">
-			<div class="col-xs-12 col-sm-8">
-				<h3 class="content-title">
-					<i class="fa fa-users fa-lg pink-col"></i> Users
-					<small></small>
-				</h3>
-			</div>
-			<div class="col-xs-12 col-sm-4 hidden-xs">
-				<!-- Main search form -->
-				<form action="#" method="get" class="mainsearch-form">
-					<div class="input-group">
-						<input type="text" name="q" class="form-control" placeholder="Quick search">
-						<span class="input-group-btn">
-							<button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i></button>
-						</span>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-</section>
-<section class="content-header navbar_header">
-	<div>
-        <nav class="navbar navbar-static-top navbar_content" role="navigation">
-          <!-- Sidebar toggle button-->
-          <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
-            <span class="sr-only">Toggle navigation</span>
-          </a>
-          <!-- Navbar Right Menu -->
-          <div class="navbar-branch-menu">
-            <ul class="nav navbar-nav">
-                
-              <li class="">
-                <a href="<?=DNADMIN?>"> <i class="fa fa-home"></i> Home </a>
-              </li>
-              <li class="dropdown notifications-menu">
-                <!-- Menu toggle button -->
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                  <i class="fa fa-angle-down"></i> Users
-                </a>
-                <ul class="dropdown-menu dropdown-menu-right" style="height: 83px;">
-                  <li>
-                    <!-- Inner Menu: contains the notifications -->
-                    <ul class="menu">
-                        
-                    <?php if($session_user_data->groups == 'Admin' || $session_user_data->groups == 'RG-Admin' || $session_user_data->groups == 'RG-SUPER-Admin'){?>
-                      <li><!-- start notification -->
-                        <a href="<?=DNADMIN?>/company/users/new">
-                          <i class="fa fa-plus text-blue"></i>New user
-                        </a>
-                      </li><!-- end notification -->
-                    <?php }?>
-                      <li><!-- start notification -->
-                        <a href="<?=DNADMIN?>/company/users/list">
-                            <i class="fa fa-bars text-blue"></i>User
-                        </a>
-                      </li><!-- end notification -->
-                    </ul>
-                  </li>
-                </ul>
-              </li>
-                
-            </ul>
-          </div>
-        </nav>
-	</div>
-</section>
+}
+$totalUsers = array_sum($statsByState);
 
-<!-- Main content -->
-<section class="content">
-		
- <!-- Small boxes (Stat box) -->
-	  <div class="row">
-          <div class="col-sm-8">
-                 <!--RECENT REGISTER -->
-                <div class="box box-info">
-                    <div class="box-header with-border">
-                      <h3 class="box-title">User</h3>
+// ── Main query ──
+$userTable = new User();
+$userTable->selectQuery(
+    "SELECT * FROM `app_users` WHERE `company_ID`=? AND `state`!='Deleted'",
+    [$session_company_ID]
+);
+?>
 
-                      <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                        </button>
-                      </div>
+
+<!-- ── Page Header ── -->
+
+
+<div class="page-header">
+  <h1>Gestion des <span>Utilisateurs</span></h1>
+ 
+  <div class="header-actions">
+     <?php if ($session_user_data->groups == 'Admin' || $session_user_data->groups == 'RG-Admin' || $session_user_data->groups == 'RG-SUPER-Admin'): ?>
+      <a href="<?= DNADMIN ?>/company/users/new" class="ul-btn-new">
+        <i class="fa fa-plus"></i> Nouvel utilisateur
+      </a>
+    <?php endif; ?>
+  </div>
+</div>
+
+<div class="ul-container">
+
+  <!-- ── Stats ── -->
+  <div class="ul-stats-row">
+    <div class="ul-stat-card">
+      <div class="ul-stat-icon all"><i class="fa fa-users"></i></div>
+      <div>
+        <div class="ul-stat-num"><?= $totalUsers ?></div>
+        <div class="ul-stat-label">Total utilisateurs</div>
+      </div>
+    </div>
+    <div class="ul-stat-card">
+      <div class="ul-stat-icon active"><i class="fa fa-check-circle"></i></div>
+      <div>
+        <div class="ul-stat-num"><?= $statsByState['Activated'] ?></div>
+        <div class="ul-stat-label">Activés</div>
+      </div>
+    </div>
+    <div class="ul-stat-card">
+      <div class="ul-stat-icon blocked"><i class="fa fa-ban"></i></div>
+      <div>
+        <div class="ul-stat-num"><?= $statsByState['Blocked'] ?></div>
+        <div class="ul-stat-label">Bloqués</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Main card ── -->
+  <div class="ul-card">
+
+    <div class="ul-card-header">
+      <div class="ul-card-header-left">
+        <div class="ul-card-header-icon"><i class="fa fa-users"></i></div>
+        <div>
+          <h2>Liste des utilisateurs</h2>
+          <p>Gérez les comptes, accès et statuts</p>
+        </div>
+      </div>
+      <span class="ul-result-count"><?= $userTable->count() ?> utilisateur<?= $userTable->count() > 1 ? 's' : '' ?></span>
+    </div>
+
+    <div class="ul-table-wrap">
+      <table class="ul-table">
+        <thead>
+          <tr>
+            <th style="width:50px">#</th>
+            <th>Utilisateur</th>
+            <th class="hide-xs">Email</th>
+            <th class="hide-xs">Rôle</th>
+            <th>Statut</th>
+            <th style="width:120px">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <?php if (!$userTable->count()): ?>
+            <tr>
+              <td colspan="6">
+                <div class="ul-empty">
+                  <div class="icon"><i class="fa fa-users"></i></div>
+                  <h3>Aucun utilisateur trouvé</h3>
+                  <p>Créez votre premier utilisateur via le bouton en haut à droite.</p>
+                </div>
+              </td>
+            </tr>
+
+          <?php else: ?>
+            <?php
+              $i = 0;
+              foreach ($userTable->data() as $user_data):
+                $i++;
+                $user_ID = $user_data->ID;
+                if ($session_user_data->groups != "Admin" && $session_user_ID != $user_ID && $session_user_data->groups != "RG-Admin" && $session_user_data->groups != "RG-SUPER-Admin") continue;
+
+                // Badge class for state
+                $stateClass = match($user_data->state) {
+                  'Activated' => 'ul-badge-activated',
+                  'Blocked'   => 'ul-badge-blocked',
+                  default     => 'ul-badge-pending',
+                };
+                // Badge class for role
+                $roleClass = match($user_data->groups) {
+                  'Admin', 'RG-Admin', 'RG-SUPER-Admin' => 'ul-badge-admin',
+                  'ContentMan' => 'ul-badge-content',
+                  default      => 'ul-badge-default',
+                };
+                // Display role label
+                $roleLabel = $user_data->groups === 'End-User' ? 'Cube-Admin' : $user_data->groups;
+
+                // Avatar initials
+                $initials = strtoupper(substr($user_data->firstname ?? '', 0, 1) . substr($user_data->lastname ?? '', 0, 1));
+            ?>
+
+            <tr class="<?= $user_data->state === 'Blocked' ? 'ul-blocked' : '' ?>">
+
+              <td style="color:var(--muted);font-size:12px;font-weight:600"><?= $i ?></td>
+
+              <td>
+                <div class="ul-user-identity">
+                  <div class="ul-avatar"><?= htmlspecialchars($initials) ?></div>
+                  <div>
+                    <div class="ul-user-name">
+                      <?= htmlspecialchars($user_data->firstname . ' ' . $user_data->lastname) ?>
                     </div>
-                    <!-- /.box-header -->
-                    <div class="box-body">
-                      <div class="table-responsive">
-                        <table class="table no-margin">
-                          <thead>
-                          <tr>
-                            <th style="width: 80px">ID</th>
-                            <th>Names</th>
-                            <th>Email</th>
-                            <th style="width: 90px">Access Type</th>
-                            <th style="width: 90px">Status</th>
-                            <th style="width: 60px">Menu</th>
-                          </tr>
-                          </thead>
-                          <tbody>
-                            <?php
-                                $userTable = new User();
-                                $userTable->selectQuery("SELECT * FROM `app_users` WHERE `company_ID`=? AND `state`!= 'Deleted'",array($session_company_ID));
-                                if(!$userTable->count()){
-                                    Functions::errorPage(404);
-                                }else{
-                                    $i = 0;
-                                    foreach($userTable->data() as $user_data){
-                                        $i++;
-                                        $user_ID = $user_data->ID;
-                                        //if($user_data->ID == $session_company_data->user_ID) continue;
-                                    ?>
-                                      <?php if($session_user_data->groups == "Admin" || $session_user_ID == $user_ID || $session_user_data->groups == "RG-Admin" || $session_user_data->groups == "RG-SUPER-Admin"){?>
-                                      <tr <?php if($user_data->state =='Blocked'){?>style="color: #aaa"<?php }?>>
-                                        <td><a><?=$i;?></a></td>
-                                        <td><?=$user_data->firstname.' '.$user_data->lastname?></td>
-                                        <td><?=$user_data->email?></td>
-                                        <?php if($user_data->state !='Blocked'){?>
-                                            <td><span class="label label-<?php echo $user_data->account_session == '1'? 'success' : 'info'; ?>">
-                                            <?php
-                                              if ($user_data->groups=='End-User') {
-                                                echo "Cube-Admin";
-                                              }else{
-                                                echo $user_data->groups;
-                                              }
-                                            // $user_data->groups;
-                                            ?>
-                                            </span>
-                                            </td>
-                                        <?php }else{?>
-                                          <td><span class="label label-default"><?=$user_data->groups?></span></td>
-                                        <?php }?>
-                                        <td><?=$user_data->state?></td>
-                                        <td>
-                                          <div><a class="user-menu-popover-<?=$user_data->ID?>  popover-el" style="cursor: pointer">More</a></div>
-
-                                            <div id="user-menu-content-<?=$user_data->ID?>" class="hidden">
-                                                <form method="post">
-                                                    <input type="hidden" name="webToken" value="56">
-                                                    <input type="hidden" name="request" value="user-state">
-                                                    <input type="hidden" name="user-id" value="<?=$user_data->ID?>">
-                                                    <ul class="popover-menu-list">
-
-								                                        <?php if($session_user_data->groups == "Admin" || $session_user_ID == $user_ID || $session_user_data->groups == "RG-Admin" || $session_user_data->groups == "RG-SUPER-Admin"){?>
-                                                            <li><a class="menu" href="<?=DNADMIN."/company/users/$user_data->ID/edit";?>"><i class="fa fa-pencil icon"></i> Edit</a></li>
-                                                            <li><a class="menu" href="<?=DNADMIN."/company/users/$user_data->ID/edit-password";?>"><i class="fa fa-unlock-alt icon"></i> Change password</a></li>
-                                                            <?php if($session_user_data->ID!=$user_data->ID){?>
-                                                                <?php if($user_data->state!='Blocked'){?>
-                                                                <li> 
-                                                                    <button class="menu" name="block" type="submit"><i class="fa fa-times-circle icon"></i> Block</button>
-                                                                </li>
-                                                                <?php }?>
-                                                                <?php if($user_data->state!='Activated'){?>
-                                                                <li> 
-                                                                    <button class="menu" name="activate" type="submit"><i class="fa fa-times-circle icon"></i> Activate</button>
-                                                                </li>
-                                                                <?php }?>
-                                                            <?php }?>
-                                                        <?php }?>
-                                                        
-                                                        
-                                                        </li><li role="separator" class="divider"></li>
-                                                        <li><a class="menu popover-close" data-popoverid=".user-menu-popover-<?=$user_data->ID?>"><i class="fa fa-times icon"></i> Close</a></li>
-
-                                                    </ul>
-                                                </form>
-                                            </div>
-
-                                            <script>
-                                                $(function(){
-                                                    // Enables popover #2
-                                                    $(".user-menu-popover-<?=$user_data->ID?>").popover({
-                                                        html : true, 
-                                                        placement : 'bottom', 
-                                                        trigger: 'manual',
-                                                        content: function() {
-                                                          return $("#user-menu-content-<?=$user_data->ID?>").html();
-                                                        },
-                                                        title: function() {
-                                                          return $("#user-menu-title-<?=$user_data->ID?>").html();
-                                                        }
-                                                    });
-                                                });
-                                            </script>
-                                        </td>
-                                      </tr>
-                                      <?php } ?>
-                                    <?php   
-                                    }
-                                }?>
-                          </tbody>
-                        </table>
-                      </div>
-                      <!-- /.table-responsive -->
+                    <div class="ul-user-email hide-sm">
+                      <?= htmlspecialchars($user_data->email) ?>
                     </div>
-                    <!-- /.box-body -->
-                    <?php if($session_user_data->groups == 'Admin' || $session_user_data->groups == 'RG-SUPER-Admin'){?>
-                    <div class="box-footer clearfix">
-                      <a href="<?=DNADMIN?>/company/users/new" class="btn btn-sm btn-info btn-flat pull-left">Create New User</a>
-                    </div>
-                    <?php }?>
-                    <!-- /.box-footer -->
                   </div>
-                 <!--RECENT REGISTER -->
-          </div>
-	  </div><!-- /.row -->
-    
-	  <div class="row">
-		<div class="col-md-8 col-xs-12">
-           
-		</div><!-- ./col -->
-		<div class="col-md-4 col-xs-12">
-           
-		</div><!-- ./col -->
-	  </div><!-- /.row -->
-    
-</section>
+                </div>
+              </td>
 
-  <script>
-    $(document).on("click", ".popover-close", function(e) {
-        $($(this).data('popoverid')).popover('hide');
-        $($(this).data('popoverid')).removeClass('open');
-    });
+              <td class="hide-xs">
+                <span style="font-size:12px;color:var(--muted)"><?= htmlspecialchars($user_data->email) ?></span>
+              </td>
 
-    $('.popover-el').click(function (e) {
-        if(!$(this).hasClass('open')){
-            $(this).popover('show');
-            $(this).addClass('open');
-        }else{
-            $(this).popover('hide');
-            $(this).removeClass('open');
-        }
-    });
+              <td class="hide-xs">
+                <span class="ul-badge <?= $roleClass ?>">
+                  <?= htmlspecialchars($roleLabel) ?>
+                </span>
+              </td>
 
+              <td>
+                <span class="ul-badge <?= $stateClass ?>">
+                  <?= htmlspecialchars($user_data->state) ?>
+                </span>
+              </td>
 
-    $(document).ready(function(){
-        $('body').on('click', function (e) {
-            $('.popover-el.open').each(function () {
-                if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
-                    $(this).popover('hide');
-                    $(this).removeClass('open');
-                }
-            });
-        });
-    });
-</script>
+              <td>
+                <!-- Trigger modal — replaces original popover -->
+                <button type="button"
+                        class="ul-btn"
+                        data-toggle="modal"
+                        data-target="#ulModal<?= $user_ID ?>"
+                        style="font-size:12px;padding:5px 12px">
+                  <i class="fa fa-ellipsis-h"></i> Actions
+                </button>
+              </td>
+
+            </tr>
+
+            <!-- ══════════════════════════════════════════════════════
+                 BOOTSTRAP MODAL — per user
+                 Original PHP logic (block/activate/edit/pw) preserved
+                 ══════════════════════════════════════════════════════ -->
+            <div class="modal fade ul-modal"
+                 id="ulModal<?= $user_ID ?>"
+                 tabindex="-1" role="dialog">
+              <div class="modal-dialog" role="document" style="max-width:500px;width:95%">
+                <div class="modal-content" style="border:none;border-radius:12px;overflow:hidden">
+
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    <h4 class="modal-title">
+                      <div class="ul-avatar" style="width:28px;height:28px;font-size:11px;border-radius:50%;background:#fff;color:#0c2d62;flex-shrink:0">
+                        <?= htmlspecialchars($initials) ?>
+                      </div>
+                      <?= htmlspecialchars($user_data->firstname . ' ' . $user_data->lastname) ?>
+                      <span>#<?= $user_ID ?></span>
+                    </h4>
+                  </div>
+
+                  <div class="modal-body">
+
+                    <div class="ul-modal-grid">
+                      <div class="ul-modal-item">
+                        <label>Prénom</label>
+                        <div class="val"><?= htmlspecialchars($user_data->firstname) ?></div>
+                      </div>
+                      <div class="ul-modal-item">
+                        <label>Nom</label>
+                        <div class="val"><?= htmlspecialchars($user_data->lastname) ?></div>
+                      </div>
+                      <div class="ul-modal-item" style="grid-column:span 2">
+                        <label>Email</label>
+                        <div class="val"><?= htmlspecialchars($user_data->email) ?></div>
+                      </div>
+                      <div class="ul-modal-item">
+                        <label>Rôle</label>
+                        <div class="val">
+                          <span class="ul-badge <?= $roleClass ?>"><?= htmlspecialchars($roleLabel) ?></span>
+                        </div>
+                      </div>
+                      <div class="ul-modal-item">
+                        <label>Statut</label>
+                        <div class="val">
+                          <span class="ul-badge <?= $stateClass ?>"><?= htmlspecialchars($user_data->state) ?></span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Actions — original PHP logic: form with hidden fields + button name = action -->
+                    <?php if ($session_user_data->groups == "Admin" || $session_user_ID == $user_ID || $session_user_data->groups == "RG-Admin" || $session_user_data->groups == "RG-SUPER-Admin"): ?>
+                    <form method="post">
+                      <input type="hidden" name="webToken"  value="56">
+                      <input type="hidden" name="request"   value="user-state">
+                      <input type="hidden" name="user-id"   value="<?= $user_ID ?>">
+
+                      <div class="ul-modal-actions">
+                        <a href="<?= DNADMIN . "/company/users/{$user_ID}/edit" ?>"
+                           class="ul-modal-btn ul-modal-btn-edit">
+                          <i class="fa fa-pencil"></i> Modifier
+                        </a>
+                        <a href="<?= DNADMIN . "/company/users/{$user_ID}/edit-password" ?>"
+                           class="ul-modal-btn ul-modal-btn-pw">
+                          <i class="fa fa-unlock-alt"></i> Changer le mot de passe
+                        </a>
+                        <?php if ($session_user_data->ID != $user_data->ID): ?>
+                          <?php if ($user_data->state != 'Blocked'): ?>
+                            <button class="ul-modal-btn ul-modal-btn-block" name="block" type="submit">
+                              <i class="fa fa-ban"></i> Bloquer
+                            </button>
+                          <?php endif; ?>
+                          <?php if ($user_data->state != 'Activated'): ?>
+                            <button class="ul-modal-btn ul-modal-btn-activate" name="activate" type="submit">
+                              <i class="fa fa-check-circle"></i> Activer
+                            </button>
+                          <?php endif; ?>
+                        <?php endif; ?>
+                      </div>
+                    </form>
+                    <?php endif; ?>
+
+                  </div><!-- /.modal-body -->
+
+                  <div class="modal-footer">
+                    <button type="button" class="ul-modal-btn ul-modal-btn-pw" data-dismiss="modal">
+                      <i class="fa fa-times"></i> Fermer
+                    </button>
+                  </div>
+
+                </div><!-- /.modal-content -->
+              </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+
+            <?php endforeach; ?>
+          <?php endif; ?>
+
+        </tbody>
+      </table>
+    </div><!-- /.ul-table-wrap -->
+
+    <!-- Footer — create user shortcut, shown only to admins (original logic) -->
+    <?php if ($session_user_data->groups == 'Admin' || $session_user_data->groups == 'RG-SUPER-Admin'): ?>
+      <div class="ul-card-footer">
+        <a href="<?= DNADMIN ?>/company/users/new" class="ul-btn-new" style="font-size:13px;padding:8px 18px">
+          <i class="fa fa-plus"></i> Créer un utilisateur
+        </a>
+      </div>
+    <?php endif; ?>
+
+  </div><!-- /.ul-card -->
+
+</div><!-- /.ul-container --> 
