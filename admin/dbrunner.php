@@ -82,13 +82,15 @@ if ($is_authenticated && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['
         
         if (empty($sql_query)) {
             $error_message = "❌ SQL query is empty";
+        } elseif (empty($_POST['selected_db'])) {
+            $error_message = "❌ Please select a database first";
         } else {
             try {
                 $start_time = microtime(true);
                 
-                // Select database if specified
-                if (!empty($_POST['selected_db'])) {
-                    $conn->select_db($_POST['selected_db']);
+                // Select database
+                if (!$conn->select_db($_POST['selected_db'])) {
+                    throw new Exception("Failed to select database: " . $conn->error);
                 }
                 
                 // Execute query
@@ -446,6 +448,9 @@ if ($is_authenticated && $conn) {
                     <button type="submit">Login</button>
                 </form>
                 
+                <div class="info" style="margin-top: 20px;">
+                    ℹ️ <strong>Default password:</strong> admin123 (Change in the PHP file!)
+                </div>
             </div>
         </div>
     <?php else: ?>
