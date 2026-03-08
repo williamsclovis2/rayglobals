@@ -184,7 +184,7 @@ if (Session::exists('errors')) {
 <html lang="fr">
 <head>
   <?php include("includes/head.php") ?>
-  <link rel="stylesheet" href="<?= DN ?>/assets/css/vacancies.css">
+  <link rel="stylesheet" href="<?= DN ?>/assets/css/vacancies-new.css">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 </head>
 <body class="hidden-bar-wrapper">

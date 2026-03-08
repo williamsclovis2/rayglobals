@@ -62,7 +62,7 @@ $isNew        = !empty($stori_serie_data->posting_date) && strtotime($stori_seri
 <html lang="fr">
 <head>
   <?php include("includes/head.php") ?>
-  <link rel="stylesheet" href="<?= DN ?>/assets/css/vacancies.css">
+  <link rel="stylesheet" href="<?= DN ?>/assets/css/vacancies-new.css">
   <style>
   /* Ensure apply links render as styled buttons not plain text */
   a.jd-apply-btn, a.jd-apply-card-btn {

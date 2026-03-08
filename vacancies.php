@@ -53,7 +53,7 @@ $totalCount = $storiSerieTable->count();
 <html lang="fr">
 <head>
   <?php include("includes/head.php") ?>
-  <link rel="stylesheet" href="<?= DN ?>/assets/css/vacancies.css">
+  <link rel="stylesheet" href="<?= DN ?>/assets/css/vacancies-new.css">
 
 
 </head>
