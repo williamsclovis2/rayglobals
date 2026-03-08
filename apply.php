@@ -187,6 +187,15 @@ if (Session::exists('errors')) {
   <link rel="stylesheet" href="<?= DN ?>/assets/css/vacancies-new.css">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 </head>
+<style>
+  .container input {
+      position: unset !important;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
+</style>
 <body class="hidden-bar-wrapper">
 <div class="page-wrapper">
 

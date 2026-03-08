@@ -674,3 +674,10 @@
   .btn-back-offers:hover{background:var(--navy-mid);color:#fff}
   /* ── Responsive ── */
   @media(max-width:767px){.field-row{grid-template-columns:1fr}.vf-steps-list{flex-direction:column}.vf-step-sub{display:none}.jd-hero-title{font-size:20px}}
+   .container input {
+      position: unset !important;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
