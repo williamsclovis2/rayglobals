@@ -23,4 +23,5 @@ RewriteRule ^scan(/*)$ riba.scan.apk [L]
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteRule ^sub_directory/(.*)$ /$1 [R=301,NC,L]
+RewriteRule ^apply(/*)$ apply.php [L,QSA]
 </IfModule>

@@ -653,6 +653,51 @@ if(Input::checkInput('request','post','1')){
 
 			}
         break;
+
+
+
+
+        // emploi
+
+        case 'emploi-status':
+            $serieId = (int) sanAsID(Input::get('serie-id', 'post'));
+            if ($serieId > 0) {
+                if (Input::checkInput('PinTop', 'post', '0')) {
+                    StoriSerieController::pinOnTop($serieId);
+                }
+                if (Input::checkInput('Published', 'post', '0')) {
+                    StoriSerieController::changeState('Published', $serieId);
+                }
+                if (Input::checkInput('Pending', 'post', '0')) {
+                    StoriSerieController::changeState('Pending', $serieId);
+                }
+                if (Input::checkInput('Deleted', 'post', '0')) {
+                    StoriSerieController::changeState('Deleted', $serieId);
+                }
+            }
+            Redirect::to(DNADMIN . '/app/emploi/list');
+        break;
+
+        case 'emploi-edit':
+            $serie_ID = Input::get('serie_id', 'get');
+            $storiSerieTable = new StoriSerie();
+            if ($storiSerieTable->find($serie_ID)) {
+                $stori_serie_data = $storiSerieTable->data();
+                $form = StoriSerieController::edit($stori_serie_data);
+                if ($form->ERRORS == false) {
+                    Session::put('success', 'Offre modifiée avec succès');
+                    Redirect::to(DNADMIN . '/app/emploi/list');
+                }
+            }
+        break;
+
+        case 'emploi-new':
+            $form = StoriSerieController::add();
+            if ($form->ERRORS == false) {
+                Session::put('success', 'Offre ajoutée avec succès');
+                Redirect::to(DNADMIN . '/app/emploi/list');
+            }
+        break;
             
     }
 }

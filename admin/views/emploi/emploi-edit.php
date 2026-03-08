@@ -121,7 +121,7 @@ $langs = [
 
       <form method="post" id="vf-edit-form" enctype="multipart/form-data">
 
-        <input type="hidden" name="request"               value="serie-edit">
+        <input type="hidden" name="request" value="emploi-edit">
         <input type="hidden" name="id"                    value="<?= (int)$d->ID ?>">
         <input type="hidden" name="register_submited"     value="1">
         <input type="hidden" name="register-event_token"  value="de220168957bd2ccff08f88e9939b95f">

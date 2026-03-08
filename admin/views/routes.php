@@ -151,7 +151,7 @@ if(@$url_struc['tree']!=""){
                            
                         switch($url_struc['branch']){
                             case 'new':
-                                include 'views/serie/serie-new'.PL;
+                                include 'views/serie/serie-newold'.PL;
                             break;
                             case 'edit':
                                 

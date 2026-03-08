@@ -163,8 +163,7 @@ $ptypes   = ['Public' => 'Publique', 'Private' => 'Privée'];
       <?php endif; ?>
 
       <form method="post" id="vacancy-form" enctype="multipart/form-data" novalidate>
-        <input type="hidden" name="request"           value="<?= $edit_mode ? 'serie-edit' : 'serie-new' ?>">
-        <input type="hidden" name="webToken"          value="<?= Config::get('time/seconds') ?>">
+        <input type="hidden" name="request" value="<?= $edit_mode ? 'emploi-edit' : 'emploi-new' ?>">        <input type="hidden" name="webToken"          value="<?= Config::get('time/seconds') ?>">
         <input type="hidden" name="register_submited" value="1">
         <?php if ($edit_mode): ?>
         <input type="hidden" name="serie_id" value="<?= (int) $d->ID ?>">
@@ -296,7 +295,7 @@ $ptypes   = ['Public' => 'Publique', 'Private' => 'Privée'];
 
           </div>
           <div class="form-actions">
-            <a href="<?= DNADMIN ?>/app/serie/list" class="btn btn-outline">
+            <a href="<?= DNADMIN ?>/app/emploi/list" class="btn btn-outline">
               <i class="fa fa-times btn-icon"></i> Annuler
             </a>
             <button type="button" class="btn btn-primary" onclick="nextStep(1)">

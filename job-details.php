@@ -26,7 +26,7 @@ $stori_serie_data = $storiSerieTable->first();
 if (!$stori_serie_data) { header('Location: ' . DN . '/vacancies.php'); exit; }
 
 /* Build apply URL — rtrim strips encoded "=" padding that breaks init re-parse */
-$applyUrl = DN . '/apply?id=' . rtrim(rawurlencode($_ID_), '%3D');
+$applyUrl = DN . '/apply?id=' . urlencode($_ID_);
 
 // Build competences & experiences arrays
 $comps = [];

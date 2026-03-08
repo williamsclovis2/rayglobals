@@ -458,7 +458,7 @@ $totalViews = $viewsTable->count() ? ($viewsTable->first()->total ?? 0) : 0;
                         <!-- Footer — button name IS the action, exactly like inspiration project -->
                         <div class="modal-footer">
                           <form method="post" style="display:inline">
-                            <input type="hidden" name="request"  value="serie-status">
+                            <input type="hidden" name="request" value="emploi-status">
                             <input type="hidden" name="serie-id" value="<?= $rid ?>">
 
                             <button type="submit" name="PinTop"
