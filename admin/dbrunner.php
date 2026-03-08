@@ -472,13 +472,12 @@ if ($is_authenticated && $conn) {
         <?php if (!empty($databases)): ?>
             <div class="form-group">
                 <label for="selected_db">Select Database:</label>
-                <select id="selected_db" name="selected_db" onchange="document.getElementById('selected_db_hidden').value = this.value">
+                <select id="selected_db" name="selected_db">
                     <option value="">-- No database selected --</option>
                     <?php foreach ($databases as $db): ?>
                         <option value="<?php echo htmlspecialchars($db); ?>"><?php echo htmlspecialchars($db); ?></option>
                     <?php endforeach; ?>
                 </select>
-                <input type="hidden" id="selected_db_hidden" name="selected_db" value="">
             </div>
         <?php endif; ?>
         
@@ -492,13 +491,13 @@ if ($is_authenticated && $conn) {
         <div id="query" class="tab-content active">
             <form method="POST">
                 <input type="hidden" name="action" value="execute">
-                <input type="hidden" name="selected_db" id="db_input" value="">
+                <input type="hidden" name="selected_db" id="db_input_query" value="">
                 <div class="form-group">
                     <label for="sql_query">SQL Query:</label>
                     <textarea id="sql_query" name="sql_query" placeholder="Enter your SQL query here...&#10;&#10;Example:&#10;SELECT * FROM users;&#10;&#10;INSERT INTO users VALUES (...);&#10;&#10;You can run multiple queries separated by semicolons"></textarea>
                 </div>
                 <div class="button-group">
-                    <button type="submit">▶️ Execute Query</button>
+                    <button type="submit" onclick="updateDatabaseField('db_input_query')">▶️ Execute Query</button>
                     <button type="reset">🔄 Clear</button>
                 </div>
             </form>
@@ -519,7 +518,7 @@ if ($is_authenticated && $conn) {
                 </div>
                 
                 <div class="button-group">
-                    <button type="submit">⬆️ Upload & Execute</button>
+                    <button type="submit" onclick="updateDatabaseField('db_input_upload')">⬆️ Upload & Execute</button>
                 </div>
             </form>
         </div>
@@ -574,12 +573,12 @@ if ($is_authenticated && $conn) {
         // Show selected tab
         document.getElementById(tab).classList.add('active');
         event.target.classList.add('active');
-        
-        // Update database selection in hidden input
-        const dbSelect = document.getElementById('selected_db');
-        if (dbSelect) {
-            document.getElementById('db_input').value = dbSelect.value;
-            document.getElementById('db_input_upload').value = dbSelect.value;
+    }
+    
+    function updateDatabaseField(fieldId) {
+        const selectedDb = document.getElementById('selected_db');
+        if (selectedDb) {
+            document.getElementById(fieldId).value = selectedDb.value;
         }
     }
     
