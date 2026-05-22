@@ -2,7 +2,7 @@
 header('Content-Type: application/json');
 header('Cache-Control: no-cache');
 
-$channel_id = 'UCH1rSXDmXzRphOYrU5xPn3Q';
+$channel_id = 'UCOwcs6zPiOfhBiG2IHWqSVQ';
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, 'https://www.youtube.com/channel/' . $channel_id . '/live');
