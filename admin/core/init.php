@@ -248,7 +248,7 @@ if ($session_subscriber->isLoggedIn()) {
         }
     }
 }
-$page="";
+// $page="";
 
 
 ?>

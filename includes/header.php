@@ -51,6 +51,9 @@
                     <div class="navbar-collapse collapse clearfix" id="navbarSupportedContent">
                         <ul class="navigation clearfix">
                             <li class="<?php echo ($page == "index" ? "current" : "")?>"><a href="<?= DN ?>/index">Accueil</a></li>
+
+                            <li class="<?php echo ($page == "channel" ? "current" : "")?>"><a href="<?= DN ?>/channel"> Notre chaîne</a></li>
+
                             <li class="dropdown <?php echo ($page == "about" ? "current" : "")?>"><a href="<?= DN ?>/about">À Propos</a>
                                 <ul>
                                     <li><a href="about">À Propos de Nous</a></li>
