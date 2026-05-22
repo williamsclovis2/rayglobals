@@ -12,7 +12,7 @@
       /* ---- Live Section ---- */
 
       /* ---- No-live screen text fix for mobile ---- */
-.rg-nolive > div {
+/* .rg-nolive > div {
   padding: 0 20px;
   width: 100%;
   box-sizing: border-box;
@@ -30,9 +30,9 @@
 }
 .rg-nolive .icon-ring {
   flex-shrink: 0;
-}
+} */
 
-@media (max-width: 480px) {
+/* @media (max-width: 480px) {
   .rg-nolive {
     padding: 20px 16px;
     gap: 10px;
@@ -54,7 +54,7 @@
     font-size: 12px;
     padding: 8px 14px;
   }
-}
+} */
       #channel-sec {
       padding: 70px 0 !important;
       background: #f8f8f8;
@@ -143,12 +143,9 @@
       .rg-player-box {
       border-radius: 10px;
       }
-      .rg-nolive .icon-ring {
-      width: 60px;
-      height: 60px;
-      }
+    
       .rg-nolive .icon-ring i {
-      font-size: 26px;
+      font-size: 20px;
       }
       .rg-nolive h5 {
       font-size: 15px;
@@ -270,9 +267,9 @@
       background: #111827;
       }
       .rg-nolive .icon-ring {
-      width: 80px; height: 80px;
+      /* width: 80px; height: 80px;
       border-radius: 50%;
-      background: rgba(192,57,43,0.15);
+      background: rgba(192,57,43,0.15); */
       display: flex; align-items: center; justify-content: center;
       }
       .rg-nolive .icon-ring i {
@@ -463,7 +460,7 @@
                               <h5>Aucun direct en ce moment</h5>
                               <p>Revenez bientôt pour suivre nos émissions en direct. En attendant, découvrez nos épisodes passés sur notre chaîne.</p>
                               <div class="text-center">
-                                 <a href="https://www.youtube.com/@rayproduction243" target="_blank" class="rg-yt-btn">
+                                 <a href="https://www.youtube.com/@Globalplus243" target="_blank" class="rg-yt-btn">
                                  <i class="fa fa-youtube-play"></i> Voir notre chaîne
                                  </a>
                               </div>
@@ -485,13 +482,13 @@
                   <div class="rg-episodes-panel">
                      <div class="rg-episodes-header">
                         <span>Épisodes récents</span>
-                        <a href="https://www.youtube.com/@rayproduction243" target="_blank">
+                        <a href="https://www.youtube.com/@Globalplus243" target="_blank">
                         Tout voir <i class="fa fa-arrow-right" style="font-size:10px;"></i>
                         </a>
                      </div>
                      <!-- Episode cards are injected here by JS -->
                      <div id="rg-episodes-list"></div>
-                     <a href="https://www.youtube.com/@rayproduction243" target="_blank" class="rg-yt-subscribe">
+                     <a href="https://www.youtube.com/@Globalplus243" target="_blank" class="rg-yt-subscribe">
                      <i class="fa fa-youtube-play" style="font-size:16px;"></i>
                      S'abonner à notre chaîne
                      </a>
@@ -657,19 +654,19 @@
          
            var EPISODES = [
              {
-               id: 'rdbkCbgYdwk',
-               title: 'Transport & Logistique — Épisode 1',
-               meta: 'Ray Globals · 12 min'
+               id: 'h8UWASEjsk4',
+               title: 'Diesel Mwata',
+               meta: 'New Music Kiu '
              },
              {
-               id: 'rdbkCbgYdwk',
-               title: 'Commerce International — Épisode 2',
-               meta: 'Ray Globals · 18 min'
+               id: 'yBWQ3WDtAZ4',
+               title: 'ARCHIP REGEP',
+               meta: 'Remember'
              },
              {
-               id: 'rdbkCbgYdwk',
-               title: 'Électronique & Innovation — Épisode 3',
-               meta: 'Ray Globals · 24 min'
+               id: 'dpy-8M7nIjo',
+               title: 'Archip Regep',
+               meta: 'Remember ( officiel audio )'
              }
            ];
          
