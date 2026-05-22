@@ -10,6 +10,51 @@
    </head>
    <style>
       /* ---- Live Section ---- */
+
+      /* ---- No-live screen text fix for mobile ---- */
+.rg-nolive > div {
+  padding: 0 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.rg-nolive h5 {
+  font-size: 15px;
+  padding: 0 10px;
+  word-break: break-word;
+}
+.rg-nolive p {
+  font-size: 12px;
+  max-width: 100%;
+  padding: 0 10px;
+  word-break: break-word;
+}
+.rg-nolive .icon-ring {
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .rg-nolive {
+    padding: 20px 16px;
+    gap: 10px;
+    justify-content: center;
+  }
+  .rg-nolive > div {
+    padding: 0;
+  }
+  .rg-nolive h5 {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+  .rg-nolive p {
+    font-size: 11px;
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+  .rg-nolive a.rg-yt-btn {
+    font-size: 12px;
+    padding: 8px 14px;
+  }
+}
       #channel-sec {
       padding: 70px 0 !important;
       background: #f8f8f8;
