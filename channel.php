@@ -395,297 +395,317 @@
       background: rgba(192,57,43,0.12);
       color: #c0392b;
       }
-      /* RADIO STATION  */
-      /* ======================================================
-      RAY GLOBALS FM — Radio Player
-      ====================================================== */
-      #rg-fm-section {
-      background: #0c2d62;
-      padding: 28px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      }
-      .rg-fm-card {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
-      padding: 22px 28px;
-      box-shadow: 0 4px 32px rgba(0,0,0,0.3);
-      /* max-width: 860px; */
-      margin: 0 auto;
-      width: 100%;
-      }
-      /* ---- Branding (left) ---- */
-      .rg-fm-brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex-shrink: 0;
-      }
-      .rg-fm-logo-ring {
-      width: 54px; height: 54px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #c0392b, #e74c3c);
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 0 4px rgba(192,57,43,0.22);
-      flex-shrink: 0;
-      }
-      .rg-fm-logo-ring i {
-      font-size: 24px;
-      color: #fff;
-      }
-      .rg-fm-brand-text {
-      display: flex;
-      flex-direction: column;
-      }
-      .rg-fm-tag {
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      color: #f2c22f;
-      text-transform: uppercase;
-      margin-bottom: 2px;
-      }
-      .rg-fm-name {
-      font-size: 20px;
-      font-weight: 800;
-      color: #fff;
-      margin: 0 0 2px;
-      line-height: 1.1;
-      white-space: nowrap;
-      }
-      .rg-fm-name span { color: #f2c22f; }
-      .rg-fm-slogan {
-      font-size: 11px;
-      color: #9ca3af;
-      margin: 0;
-      white-space: nowrap;
-      }
-      /* ---- Center ---- */
-      .rg-fm-center {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-      }
-      /* Wave visualizer */
-      .rg-fm-wave {
-      display: flex;
-      align-items: flex-end;
-      gap: 3px;
-      height: 36px;
-      }
-      .rg-fm-wave span {
-      display: block;
-      width: 4px;
-      border-radius: 4px;
-      background: #374151;
-      height: 6px;
-      transform-origin: bottom;
-      transition: background 0.3s;
-      }
-      .rg-fm-wave.playing span {
-      animation: rgWave 0.9s ease-in-out infinite alternate;
-      background: #f2c22f;
-      }
-      .rg-fm-wave.playing span:nth-child(1)  { animation-duration: 0.60s; }
-      .rg-fm-wave.playing span:nth-child(2)  { animation-duration: 0.80s; }
-      .rg-fm-wave.playing span:nth-child(3)  { animation-duration: 0.50s; }
-      .rg-fm-wave.playing span:nth-child(4)  { animation-duration: 0.70s; }
-      .rg-fm-wave.playing span:nth-child(5)  { animation-duration: 1.00s; }
-      .rg-fm-wave.playing span:nth-child(6)  { animation-duration: 0.65s; }
-      .rg-fm-wave.playing span:nth-child(7)  { animation-duration: 0.85s; }
-      .rg-fm-wave.playing span:nth-child(8)  { animation-duration: 0.55s; }
-      .rg-fm-wave.playing span:nth-child(9)  { animation-duration: 0.75s; }
-      .rg-fm-wave.playing span:nth-child(10) { animation-duration: 0.95s; }
-      .rg-fm-wave.playing span:nth-child(11) { animation-duration: 0.62s; }
-      .rg-fm-wave.playing span:nth-child(12) { animation-duration: 0.82s; }
-      @keyframes rgWave {
-      0%   { height: 5px; }
-      100% { height: 34px; }
-      }
-      /* Play button */
-      .rg-fm-playbtn {
-      width: 52px; height: 52px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #c0392b, #e74c3c);
-      border: none;
-      color: #fff;
-      font-size: 18px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 4px 18px rgba(192,57,43,0.45);
-      transition: transform 0.15s, box-shadow 0.15s, background 0.3s;
-      flex-shrink: 0;
-      }
-      .rg-fm-playbtn:hover {
-      transform: scale(1.08);
-      box-shadow: 0 6px 24px rgba(192,57,43,0.55);
-      }
-      .rg-fm-playbtn:active { transform: scale(0.97); }
-      .rg-fm-btn-playing {
-      background: linear-gradient(135deg, #b91c1c, #dc2626) !important;
-      box-shadow: 0 0 0 6px rgba(220,38,38,0.25), 0 4px 18px rgba(192,57,43,0.5) !important;
-      animation: rgPulse 1.8s ease-in-out infinite;
-      }
-      @keyframes rgPulse {
-      0%, 100% { box-shadow: 0 0 0 6px rgba(220,38,38,0.25), 0 4px 18px rgba(192,57,43,0.5); }
-      50%       { box-shadow: 0 0 0 12px rgba(220,38,38,0.08), 0 4px 18px rgba(192,57,43,0.5); }
-      }
-      /* Now playing text */
-      .rg-fm-nowplaying {
-      font-size: 11px;
-      color: #9ca3af;
-      margin: 0;
-      text-align: center;
-      min-height: 16px;
-      }
-      .rg-fm-nowplaying.live {
-      color: #f2c22f;
-      font-weight: 600;
-      }
-      /* ---- Right: Volume + link ---- */
-      .rg-fm-right {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      flex-shrink: 0;
-      }
-      .rg-fm-vol-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      }
-      /* Volume icon */
-      .rg-fm-vol-icon {
-      color: #9ca3af;
-      font-size: 14px;
-      transition: color 0.25s, transform 0.2s;
-      cursor: pointer;
-      }
-      .rg-fm-vol-icon:hover { color: #fff; transform: scale(1.15); }
-      .rg-fm-muted {
-      color: #ef4444 !important;
-      animation: rgShake 0.3s ease;
-      }
-      @keyframes rgShake {
-      0%,100% { transform: translateX(0); }
-      25%      { transform: translateX(-3px); }
-      75%      { transform: translateX(3px); }
-      }
-      /* Volume track */
-      .rg-fm-vol-track {
-      position: relative;
-      width: 90px;
-      height: 6px;
-      border-radius: 6px;
-      background: #374151;
-      }
-      .rg-fm-vol-fill {
-      position: absolute;
-      left: 0; top: 0;
-      height: 100%;
-      border-radius: 6px;
-      width: 80%;
-      background: #22c55e;
-      pointer-events: none;
-      transition: width 0.05s, background 0.3s;
-      }
-      .rg-fm-vol {
-      position: absolute;
-      top: 50%;
-      left: 0;
-      transform: translateY(-50%);
-      width: 100%;
-      height: 100%;
-      -webkit-appearance: none;
-      appearance: none;
-      background: transparent;
-      outline: none;
-      cursor: pointer;
-      margin: 0;
-      }
-      .rg-fm-vol::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 16px; height: 16px;
-      border-radius: 50%;
-      background: #fff;
-      border: 2px solid #c0392b;
-      cursor: pointer;
-      box-shadow: 0 0 0 3px rgba(192,57,43,0.2);
-      transition: border-color 0.2s, transform 0.15s;
-      }
-      .rg-fm-vol::-webkit-slider-thumb:hover {
-      border-color: #f2c22f;
-      transform: scale(1.2);
-      }
-      .rg-fm-vol::-moz-range-thumb {
-      width: 16px; height: 16px;
-      border-radius: 50%;
-      background: #fff;
-      border: 2px solid #c0392b;
-      cursor: pointer;
-      border: none;
-      }
-      /* External link */
-      .rg-fm-ext-link {
-      font-size: 11px;
-      color: #9ca3af;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      transition: color 0.2s;
-      white-space: nowrap;
-      }
-      .rg-fm-ext-link:hover { color: #f2c22f; }
-      /* ======================================================
-      RESPONSIVE
-      ====================================================== */
-      @media (max-width: 991px) {
-      .rg-fm-card {
-      gap: 18px;
-      padding: 18px 20px;
-      }
-      .rg-fm-name { font-size: 17px; }
-      .rg-fm-slogan { display: none; }
-      }
-      @media (max-width: 767px) {
-      #rg-fm-section { padding: 22px 0; }
-      .rg-fm-card {
-      flex-direction: column;
-      align-items: center;
-      padding: 22px 16px;
-      gap: 18px;
-      text-align: center;
-      }
-      .rg-fm-brand {
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      }
-      .rg-fm-brand-text { align-items: center; }
-      .rg-fm-slogan { display: block; }
-      .rg-fm-center { width: 100%; }
-      .rg-fm-right {
-      width: 100%;
-      flex-direction: row;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 14px;
-      }
-      .rg-fm-vol-track { width: 130px; }
-      }
-      @media (max-width: 480px) {
-      #rg-fm-section { padding: 16px 0; }
-      .rg-fm-name { font-size: 20px; }
-      .rg-fm-vol-track { width: 110px; }
-      }
+     /* ======================================================
+   RAY GLOBALS FM — Radio Player
+   ====================================================== */
+#rg-fm-section {
+  background: #1a1a2e;
+  padding: 28px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.rg-fm-card {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 16px;
+  padding: 22px 28px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.3);
+  max-width: 860px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ---- Branding (left) ---- */
+.rg-fm-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+.rg-fm-logo-ring {
+  width: 70px; height: 70px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.15);
+  flex-shrink: 0;
+}
+.rg-fm-logo-ring img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.rg-fm-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+.rg-fm-tag {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #e05a00;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.rg-fm-name {
+  font-size: 20px;
+  font-weight: 800;
+  color: #111;
+  margin: 0 0 2px;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.rg-fm-name img{
+   width: 150px;
+}
+.rg-fm-name span { color: #e05a00; font-size: 28px; }
+.rg-fm-slogan {
+  font-size: 11px;
+  color: #666;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* ---- Center ---- */
+.rg-fm-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* Wave visualizer */
+.rg-fm-wave {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 36px;
+}
+.rg-fm-wave span {
+  display: block;
+  width: 4px;
+  border-radius: 4px;
+  background: #ddd;
+  height: 6px;
+  transform-origin: bottom;
+  transition: background 0.3s;
+}
+.rg-fm-wave.playing span {
+  animation: rgWave 0.9s ease-in-out infinite alternate;
+  background: #e05a00;
+}
+.rg-fm-wave.playing span:nth-child(1)  { animation-duration: 0.60s; }
+.rg-fm-wave.playing span:nth-child(2)  { animation-duration: 0.80s; }
+.rg-fm-wave.playing span:nth-child(3)  { animation-duration: 0.50s; }
+.rg-fm-wave.playing span:nth-child(4)  { animation-duration: 0.70s; }
+.rg-fm-wave.playing span:nth-child(5)  { animation-duration: 1.00s; }
+.rg-fm-wave.playing span:nth-child(6)  { animation-duration: 0.65s; }
+.rg-fm-wave.playing span:nth-child(7)  { animation-duration: 0.85s; }
+.rg-fm-wave.playing span:nth-child(8)  { animation-duration: 0.55s; }
+.rg-fm-wave.playing span:nth-child(9)  { animation-duration: 0.75s; }
+.rg-fm-wave.playing span:nth-child(10) { animation-duration: 0.95s; }
+.rg-fm-wave.playing span:nth-child(11) { animation-duration: 0.62s; }
+.rg-fm-wave.playing span:nth-child(12) { animation-duration: 0.82s; }
+
+@keyframes rgWave {
+  0%   { height: 5px; }
+  100% { height: 34px; }
+}
+
+/* Play button */
+.rg-fm-playbtn {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e05a00, #ff7a1f);
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(224,90,0,0.4);
+  transition: transform 0.15s, box-shadow 0.15s, background 0.3s;
+  flex-shrink: 0;
+}
+.rg-fm-playbtn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 24px rgba(224,90,0,0.55);
+}
+.rg-fm-playbtn:active { transform: scale(0.97); }
+
+.rg-fm-btn-playing {
+  background: linear-gradient(135deg, #c44f00, #e05a00) !important;
+  box-shadow: 0 0 0 6px rgba(224,90,0,0.2), 0 4px 18px rgba(224,90,0,0.45) !important;
+  animation: rgPulse 1.8s ease-in-out infinite;
+}
+@keyframes rgPulse {
+  0%, 100% { box-shadow: 0 0 0 6px rgba(224,90,0,0.2), 0 4px 18px rgba(224,90,0,0.45); }
+  50%       { box-shadow: 0 0 0 12px rgba(224,90,0,0.06), 0 4px 18px rgba(224,90,0,0.45); }
+}
+
+/* Now playing text */
+.rg-fm-nowplaying {
+  font-size: 11px;
+  color: #888;
+  margin: 0;
+  text-align: center;
+  min-height: 16px;
+}
+.rg-fm-nowplaying.live {
+  color: #e05a00;
+  font-weight: 600;
+}
+
+/* ---- Right: Volume + link ---- */
+.rg-fm-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.rg-fm-vol-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Volume icons */
+.rg-fm-vol-icon {
+  color: #aaa;
+  font-size: 14px;
+  transition: color 0.25s, transform 0.2s;
+  cursor: pointer;
+}
+.rg-fm-vol-icon:hover { color: #333; transform: scale(1.15); }
+.rg-fm-muted {
+  color: #ef4444 !important;
+  animation: rgShake 0.3s ease;
+}
+@keyframes rgShake {
+  0%,100% { transform: translateX(0); }
+  25%      { transform: translateX(-3px); }
+  75%      { transform: translateX(3px); }
+}
+
+/* Volume track */
+.rg-fm-vol-track {
+  position: relative;
+  width: 90px;
+  height: 6px;
+  border-radius: 6px;
+  background: #e5e7eb;
+}
+.rg-fm-vol-fill {
+  position: absolute;
+  left: 0; top: 0;
+  height: 100%;
+  border-radius: 6px;
+  width: 80%;
+  background: #22c55e;
+  pointer-events: none;
+  transition: width 0.05s, background 0.3s;
+}
+.rg-fm-vol {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 100%;
+  height: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  margin: 0;
+}
+.rg-fm-vol::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #e05a00;
+  cursor: pointer;
+  box-shadow: 0 0 0 3px rgba(224,90,0,0.2);
+  transition: border-color 0.2s, transform 0.15s;
+}
+.rg-fm-vol::-webkit-slider-thumb:hover {
+  border-color: #111;
+  transform: scale(1.2);
+}
+.rg-fm-vol::-moz-range-thumb {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #e05a00;
+  cursor: pointer;
+}
+
+/* External link */
+.rg-fm-ext-link {
+  font-size: 11px;
+  color: #aaa;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+.rg-fm-ext-link:hover { color: #e05a00; }
+
+/* ======================================================
+   RESPONSIVE
+   ====================================================== */
+@media (max-width: 991px) {
+  .rg-fm-card {
+    gap: 18px;
+    padding: 18px 20px;
+  }
+  .rg-fm-name { font-size: 17px; }
+  .rg-fm-slogan { display: none; }
+}
+
+@media (max-width: 767px) {
+  #rg-fm-section { padding: 22px 0; }
+  .rg-fm-card {
+    flex-direction: column;
+    align-items: center;
+    padding: 22px 16px;
+    gap: 18px;
+    text-align: center;
+  }
+  .rg-fm-brand {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .rg-fm-brand-text { align-items: center; }
+  .rg-fm-slogan { display: block; }
+  .rg-fm-center { width: 100%; }
+  .rg-fm-right {
+    width: 100%;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .rg-fm-vol-track { width: 130px; }
+}
+
+@media (max-width: 480px) {
+  #rg-fm-section { padding: 16px 0; }
+  .rg-fm-logo-ring { width: 58px; height: 58px; }
+  .rg-fm-name { font-size: 18px; }
+  .rg-fm-vol-track { width: 110px; }
+}
    </style>
    <body class="hidden-bar-wrapper">
       <div class="page-wrapper">
@@ -719,13 +739,12 @@
             <div class="container">
                <div class="rg-fm-card">
                   <!-- Left: Branding -->
+                  <!-- Left: Branding -->
                   <div class="rg-fm-brand">
-                     <div class="rg-fm-logo-ring">
-                        <i class="fa fa-podcast"></i>
-                     </div>
+                     
                      <div class="rg-fm-brand-text">
                         <span class="rg-fm-tag">RADIO EN LIGNE</span>
-                        <h3 class="rg-fm-name">Global+  <span>FM</span></h3>
+                        <h3 class="rg-fm-name"><img src="assets/images/globalplus.png"><span> - FM</span></h3>
                         <p class="rg-fm-slogan">L'info, la musique &amp; la culture — 24h/24</p>
                      </div>
                   </div>
@@ -1114,117 +1133,120 @@
       </script>
       <script>
          (function () {
-           /* ---- Replace with your actual stream URL when ready ---- */
-           var STREAM_URL = 'https://stream.zeno.fm/0r0xa792kwzuv';
-         
-           var audio    = new Audio(STREAM_URL);
-           audio.volume = 0.8;
-           audio.preload = 'none';
-           var playing  = false;
-           var muted    = false;
-           var lastVol  = 0.8;
-         
-           var btn      = document.getElementById('rg-fm-playbtn');
-           var icon     = document.getElementById('rg-fm-icon');
-           var status   = document.getElementById('rg-fm-status');
-           var wave     = document.getElementById('rg-fm-wave');
-           var volSlider = document.getElementById('rg-fm-vol');
-           var volIconL  = document.getElementById('rg-fm-vol-left');
-           var volIconR  = document.getElementById('rg-fm-vol-right');
-           var volFill   = document.getElementById('rg-fm-vol-fill');
-         
-           /* ---- Update slider fill color based on volume level ---- */
-           function updateSliderUI(val) {
-             var pct   = val * 100;
-             var color = pct === 0  ? '#ef4444'
-                       : pct < 40   ? '#f2c22f'
-                       :               '#22c55e';
-             volFill.style.width      = pct + '%';
-             volFill.style.background = color;
-             volIconR.style.color     = pct === 0 ? '#ef4444' : color;
-           }
-         
-           /* ---- Toggle mute ---- */
-           function toggleMute() {
-             if (!muted) {
-               lastVol = audio.volume || 0.8;
-               audio.volume     = 0;
-               volSlider.value  = 0;
-               muted            = true;
-               volIconL.className = 'fa fa-volume-off rg-fm-vol-icon rg-fm-muted';
-               volIconL.title     = 'Réactiver le son';
-             } else {
-               audio.volume     = lastVol;
-               volSlider.value  = lastVol;
-               muted            = false;
-               volIconL.className = 'fa fa-volume-down rg-fm-vol-icon';
-               volIconL.title     = 'Couper le son';
-             }
-             updateSliderUI(audio.volume);
-           }
-         
-           /* ---- Play ---- */
-           function startPlay() {
-             audio.src = STREAM_URL;
-             audio.play().then(function () {
+         /* ---- Replace with your actual stream URL when ready ---- */
+         var STREAM_URL = 'https://stream.zeno.fm/0r0xa792kwzuv';
+
+         var audio     = new Audio(STREAM_URL);
+         audio.volume  = 0.8;
+         audio.preload = 'none';
+         var playing   = false;
+         var muted     = false;
+         var lastVol   = 0.8;
+
+         var btn       = document.getElementById('rg-fm-playbtn');
+         var icon      = document.getElementById('rg-fm-icon');
+         var status    = document.getElementById('rg-fm-status');
+         var wave      = document.getElementById('rg-fm-wave');
+         var volSlider = document.getElementById('rg-fm-vol');
+         var volIconL  = document.getElementById('rg-fm-vol-left');
+         var volIconR  = document.getElementById('rg-fm-vol-right');
+         var volFill   = document.getElementById('rg-fm-vol-fill');
+
+         /* ---- Update slider fill + icon colors by volume level ---- */
+         function updateSliderUI(val) {
+            var pct   = val * 100;
+            var color = pct === 0 ? '#ef4444'
+                     : pct < 40  ? '#f59e0b'
+                     :              '#22c55e';
+            volFill.style.width      = pct + '%';
+            volFill.style.background = color;
+            volIconR.style.color     = pct === 0 ? '#ef4444' : color;
+         }
+
+         /* ---- Toggle mute ---- */
+         function toggleMute() {
+            if (!muted) {
+               lastVol              = audio.volume || 0.8;
+               audio.volume         = 0;
+               volSlider.value      = 0;
+               muted                = true;
+               volIconL.className   = 'fa fa-volume-off rg-fm-vol-icon rg-fm-muted';
+               volIconL.title       = 'Réactiver le son';
+            } else {
+               audio.volume         = lastVol;
+               volSlider.value      = lastVol;
+               muted                = false;
+               volIconL.className   = 'fa fa-volume-down rg-fm-vol-icon';
+               volIconL.title       = 'Couper le son';
+            }
+            updateSliderUI(audio.volume);
+         }
+
+         /* ---- Play ---- */
+         function startPlay() {
+            audio.src = STREAM_URL;
+            audio.play().then(function () {
                playing = true;
                icon.className = 'fa fa-stop';
                btn.classList.add('rg-fm-btn-playing');
                wave.classList.add('playing');
-               status.textContent = '● EN DIRECT — RayGlobals FM';
+               status.textContent = '● EN DIRECT — Global+ FM';
                status.classList.add('live');
-             }).catch(function () {
+            }).catch(function () {
                status.textContent = 'Erreur de connexion. Réessayez.';
-             });
-           }
-         
-           /* ---- Stop ---- */
-           function stopPlay() {
-             audio.pause();
-             audio.currentTime = 0;
-             playing = false;
-             icon.className = 'fa fa-play';
-             btn.classList.remove('rg-fm-btn-playing');
-             wave.classList.remove('playing');
-             status.textContent = 'Cliquez pour écouter';
-             status.classList.remove('live');
-           }
-         
-           /* ---- Events ---- */
-           btn.addEventListener('click', function () {
-             playing ? stopPlay() : startPlay();
-           });
-         
-           volSlider.addEventListener('input', function () {
-             var val  = parseFloat(this.value);
-             audio.volume = val;
-             muted        = (val === 0);
-             if (val > 0) lastVol = val;
-             volIconL.className = val === 0
+            });
+         }
+
+         /* ---- Stop ---- */
+         function stopPlay() {
+            audio.pause();
+            audio.currentTime = 0;
+            playing = false;
+            icon.className = 'fa fa-play';
+            btn.classList.remove('rg-fm-btn-playing');
+            wave.classList.remove('playing');
+            status.textContent = 'Cliquez pour écouter';
+            status.classList.remove('live');
+         }
+
+         /* ---- Button events ---- */
+         btn.addEventListener('click', function () {
+            playing ? stopPlay() : startPlay();
+         });
+
+         /* ---- Volume slider ---- */
+         volSlider.addEventListener('input', function () {
+            var val      = parseFloat(this.value);
+            audio.volume = val;
+            muted        = (val === 0);
+            if (val > 0) lastVol = val;
+            volIconL.className = val === 0
                ? 'fa fa-volume-off rg-fm-vol-icon rg-fm-muted'
                : 'fa fa-volume-down rg-fm-vol-icon';
-             volIconL.title = val === 0 ? 'Réactiver le son' : 'Couper le son';
-             updateSliderUI(val);
-           });
-         
-           volIconL.addEventListener('click', toggleMute);
-         
-           audio.addEventListener('waiting', function () {
-             if (playing) status.textContent = 'Chargement…';
-           });
-           audio.addEventListener('playing', function () {
-             if (playing) status.textContent = '● EN DIRECT — RayGlobals FM';
-           });
-           audio.addEventListener('error', function () {
-             stopPlay();
-             status.textContent = 'Stream indisponible pour le moment.';
-           });
-         
-           /* ---- Init ---- */
-           updateSliderUI(0.8);
-         
+            volIconL.title = val === 0 ? 'Réactiver le son' : 'Couper le son';
+            updateSliderUI(val);
+         });
+
+         /* ---- Mute icon click ---- */
+         volIconL.addEventListener('click', toggleMute);
+
+         /* ---- Audio state listeners ---- */
+         audio.addEventListener('waiting', function () {
+            if (playing) status.textContent = 'Chargement…';
+         });
+         audio.addEventListener('playing', function () {
+            if (playing) status.textContent = '● EN DIRECT — Global+ FM';
+         });
+         audio.addEventListener('error', function () {
+            stopPlay();
+            status.textContent = 'Stream indisponible pour le moment.';
+         });
+
+         /* ---- Init UI ---- */
+         updateSliderUI(0.8);
+
          })();
-      </script>
+         </script>
    </body>
    <!-- Scroll To Top -->
    <div class="scroll-to-top scroll-to-target" data-target="html"><span class="fa fa-arrow-up"></span></div>
