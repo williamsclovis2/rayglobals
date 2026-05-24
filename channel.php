@@ -724,7 +724,7 @@
          <section class="page-title">
             <div class="content" style="background-image: url(assets/images/podcast.jpg)">
                <div class="auto-container">
-                  <h1>Notre chaîne youtube</h1>
+                  <h1>Notre chaîne YouTube <br> et notre radio FM</h1>
                </div>
             </div>
             <!-- <ul class="page-breadcrumb">
