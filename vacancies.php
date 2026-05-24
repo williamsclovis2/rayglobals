@@ -54,6 +54,7 @@ $totalCount = $storiSerieTable->count();
 <head>
   <?php include("includes/head.php") ?>
   <link rel="stylesheet" href="<?= DN ?>/assets/css/vacancies-new.css">
+  <link rel="stylesheet" href="<?= DN ?>/assets/css/channels.css">
 
 
 </head>
@@ -322,5 +323,6 @@ $totalCount = $storiSerieTable->count();
 
 <div class="scroll-to-top scroll-to-target" data-target="html"><span class="fa fa-arrow-up"></span></div>
 <?php include("includes/script.php") ?>
+<script src="includes/channels.js"></script>
 </body>
 </html>

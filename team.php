@@ -8,6 +8,8 @@
 <html>
 <head>
 	<?php include("includes/head.php")?>
+	<link rel="stylesheet" href="assets/css/channels.css">
+
 </head>
 
 <body class="hidden-bar-wrapper">
@@ -350,6 +352,7 @@
 <div class="scroll-to-top scroll-to-target" data-target="html"><span class="fa fa-arrow-up"></span></div>
 
 <?php include("includes/script.php")?>
+ <script src="includes/channels.js"></script>
 
 </body>
 

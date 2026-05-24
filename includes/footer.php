@@ -81,3 +81,39 @@
         <div class="copyright">© <a href="index">Ray Globals</a> <?php echo date("Y"); ?>. Tous droits réservés.</div>
     </div>
 </div>
+
+<!-- =====================================================
+     Global+ FM — Fixed Mini Player
+     ===================================================== -->
+
+<div id="rg-mini-player" role="complementary" aria-label="Global+ FM mini lecteur">
+   <!-- Close × -->
+   <button class="rg-mini-close" id="rg-mini-close-btn" aria-label="Masquer le lecteur">&#10005;</button>
+
+   <!-- Logo -->
+   <div class="rg-mini-logo">
+      <img src="<?= DN ?>/assets/images/globalplus.png" alt="Global+ FM" />
+   </div>
+
+   <!-- Info + wave -->
+   <div class="rg-mini-info">
+      <p class="rg-mini-label">Radio en ligne</p>
+      <p class="rg-mini-name">Global+ FM</p>
+      <!-- Wave bars -->
+      <div class="rg-mini-wave" id="rg-mini-wave">
+         <span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <p class="rg-mini-status" id="rg-mini-status">Cliquez pour écouter</p>
+   </div>
+
+   <!-- Play/Stop -->
+   <button class="rg-mini-playbtn" id="rg-mini-playbtn" aria-label="Écouter / Arrêter Global+ FM">
+      <i class="fa fa-play" id="rg-mini-icon"></i>
+   </button>
+</div>
+
+<!-- Reopen tab (shown after player is closed) -->
+<div id="rg-mini-reopen" role="button" tabindex="0" aria-label="Réouvrir Global+ FM">
+   <img src="<?= DN ?>/assets/images/globalplus.png" alt="Global+ FM" />
+   <span>Global+ FM</span>
+</div>

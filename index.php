@@ -7,7 +7,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<?php include("includes/head.php")?>
+      <?php include("includes/head.php")?>
+      <link rel="stylesheet" href="assets/css/channels.css">
 </head>
 
 <body class="hidden-bar-wrapper">
@@ -510,8 +511,8 @@
 	
 	<!-- Main Footer -->
     <footer class="footer-style-two" style="background-image:url(assets/images/background/10.jpg)">
-		<?php include("includes/footer.php")?>
-	</footer>
+        <?php include("includes/footer.php")?>
+    </footer>
 	<!-- End Main Footer -->
 	
 	
@@ -521,11 +522,12 @@
 
 
 
+
 <!-- Scroll To Top -->
 <div class="scroll-to-top scroll-to-target" data-target="html"><span class="fa fa-arrow-up"></span></div>
 
 <?php include("includes/script.php")?>
-
+<script src="includes/channels.js"></script>
 </body>
 
 <!-- Mirrored from uniqthemes.com/html/bricks/index-2.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 25 Feb 2025 14:54:23 GMT -->
