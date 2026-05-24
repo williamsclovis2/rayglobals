@@ -725,7 +725,7 @@
                      </div>
                      <div class="rg-fm-brand-text">
                         <span class="rg-fm-tag">RADIO EN LIGNE</span>
-                        <h3 class="rg-fm-name">RayGlobals <span>FM</span></h3>
+                        <h3 class="rg-fm-name">Global+ FM <span>FM</span></h3>
                         <p class="rg-fm-slogan">L'info, la musique &amp; la culture — 24h/24</p>
                      </div>
                   </div>
